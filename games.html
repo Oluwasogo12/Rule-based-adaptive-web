@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Game Zone | Dynamic Mastery Assessment</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+
+<!-- SIDEBAR -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="document.getElementById('sidebar').classList.remove('open');this.style.display='none'"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><span>⚡</span></div>
+    <div class="logo-text"><span class="logo-main">DMA</span><span class="logo-sub">Mastery</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html" class="sn-item"><span class="sn-icon">🏠</span><span>Dashboard</span></a>
+    <a href="quiz.html" class="sn-item"><span class="sn-icon">🧠</span><span>Practice Session</span></a>
+    <a href="reports.html" class="sn-item"><span class="sn-icon">📊</span><span>Reports</span></a>
+    <a href="games.html" class="sn-item active"><span class="sn-icon">🎮</span><span>Game Zone</span><span class="sn-new">NEW</span></a>
+    <a href="profile.html" class="sn-item"><span class="sn-icon">👤</span><span>Profile</span></a>
+    <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border)"></div>
+    <a href="login.html" class="sn-item sn-logout"><span class="sn-icon">🚪</span><span>Logout</span></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="sidebar-user">
+      <div class="su-avatar">D</div>
+      <div class="su-info"><span class="su-name">David A.</span><span class="su-type">UTME Student</span></div>
+    </div>
+  </div>
+</aside>
+
+<main class="dashboard-main">
+  <header class="dash-header">
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="dash-header-content">
+      <h1 class="dash-welcome">Game Zone 🎮</h1>
+      <p class="dash-date">Take a break, recharge your brain</p>
+    </div>
+    <div class="dash-header-actions">
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <span class="toggle-option" id="darkOpt" title="Dark">🌙</span>
+        <span class="toggle-option active" id="lightOpt" title="Light">☀️</span>
+      </button>
+      <a href="quiz.html" class="btn btn-primary btn-sm">Back to Study</a>
+    </div>
+  </header>
+
+  <!-- GAME HUB -->
+  <div class="games-hub" id="gameHub">
+    <div class="games-hub-header">
+      <h1>🎉 Welcome to the Game Zone!</h1>
+      <p>Studied hard? You deserve a break. Pick a game below to relax and recharge your brain 🧠</p>
+    </div>
+
+    <div class="games-grid">
+      <!-- Tic Tac Toe -->
+      <div class="game-card" data-game="tictactoe" onclick="openGame('tictactoe')">
+        <span class="game-icon">🎯</span>
+        <h3>Tic Tac Toe</h3>
+        <p>Classic X vs O showdown. Play solo against the AI or challenge a friend sitting next to you!</p>
+        <span class="game-tag tag-fun">2 Players or vs AI</span>
+      </div>
+      <!-- Memory Match -->
+      <div class="game-card" data-game="memory" onclick="openGame('memory')">
+        <span class="game-icon">🃏</span>
+        <h3>Memory Match</h3>
+        <p>Flip cards and find matching pairs. Sharpen your concentration and memory skills!</p>
+        <span class="game-tag tag-brain">Brain Training</span>
+      </div>
+      <!-- Word Scramble -->
+      <div class="game-card" data-game="scramble" onclick="openGame('scramble')">
+        <span class="game-icon">🔤</span>
+        <h3>Word Scramble</h3>
+        <p>Unscramble science and study-related words against the clock. Bonus: you might learn something!</p>
+        <span class="game-tag tag-vocab">Vocabulary Boost</span>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:16px 0 8px;">
+      <p style="color:var(--text-3);font-size:13px;font-weight:600;">🎓 All games are designed to be relaxing yet brain-stimulating — perfect after a tough study session</p>
+    </div>
+  </div>
+
+  <!-- ══════════ TIC TAC TOE ══════════ -->
+  <div class="game-arena" id="arena-tictactoe">
+    <div class="game-arena-header">
+      <button class="btn btn-ghost btn-sm" onclick="closeGame()">← Back to Games</button>
+      <h2>🎯 Tic Tac Toe</h2>
+      <div class="game-score-bar">
+        <div class="gsb-item">❌ <span id="ttt-score-x">0</span></div>
+        <div class="gsb-item" style="color:var(--text-3)">|</div>
+        <div class="gsb-item">🤝 <span id="ttt-score-d">0</span></div>
+        <div class="gsb-item" style="color:var(--text-3)">|</div>
+        <div class="gsb-item">⭕ <span id="ttt-score-o">0</span></div>
+      </div>
+    </div>
+
+    <div class="ttt-wrapper">
+      <div class="ttt-mode">
+        <button class="btn btn-sm" id="tttModeAI" onclick="setTTTMode('ai')" style="background:var(--primary);color:#fff">🤖 vs AI</button>
+        <button class="btn btn-outline btn-sm" id="tttMode2P" onclick="setTTTMode('2p')">👥 2 Players</button>
+      </div>
+
+      <div class="ttt-players">
+        <div class="ttt-player active" id="tttP1">❌ You (X)</div>
+        <div class="ttt-player" id="tttP2">⭕ AI (O)</div>
+      </div>
+
+      <p class="ttt-status" id="tttStatus">Your turn! Tap a square ☝️</p>
+
+      <div class="ttt-board" id="tttBoard">
+        <div class="ttt-cell" data-index="0" onclick="tttMove(0)"></div>
+        <div class="ttt-cell" data-index="1" onclick="tttMove(1)"></div>
+        <div class="ttt-cell" data-index="2" onclick="tttMove(2)"></div>
+        <div class="ttt-cell" data-index="3" onclick="tttMove(3)"></div>
+        <div class="ttt-cell" data-index="4" onclick="tttMove(4)"></div>
+        <div class="ttt-cell" data-index="5" onclick="tttMove(5)"></div>
+        <div class="ttt-cell" data-index="6" onclick="tttMove(6)"></div>
+        <div class="ttt-cell" data-index="7" onclick="tttMove(7)"></div>
+        <div class="ttt-cell" data-index="8" onclick="tttMove(8)"></div>
+      </div>
+
+      <button class="btn btn-primary" onclick="tttReset()">🔄 New Game</button>
+    </div>
+  </div>
+
+  <!-- ══════════ MEMORY MATCH ══════════ -->
+  <div class="game-arena" id="arena-memory">
+    <div class="game-arena-header">
+      <button class="btn btn-ghost btn-sm" onclick="closeGame()">← Back to Games</button>
+      <h2>🃏 Memory Match</h2>
+      <div class="game-score-bar">
+        <div class="gsb-item">🔍 Moves: <span id="memMoves">0</span></div>
+        <div class="gsb-item">✅ Pairs: <span id="memPairs">0</span>/8</div>
+        <div class="gsb-item">⏱ <span id="memTimer">0:00</span></div>
+      </div>
+    </div>
+
+    <div class="memory-wrapper">
+      <div class="memory-stats">
+        <div class="memory-stat">
+          <span id="memBestMoves">--</span>
+          <span>Best Moves</span>
+        </div>
+        <div class="memory-stat">
+          <span id="memBestTime">--</span>
+          <span>Best Time</span>
+        </div>
+      </div>
+      <div class="memory-board" id="memoryBoard"></div>
+      <button class="btn btn-primary" onclick="memoryReset()">🔄 New Game</button>
+    </div>
+  </div>
+
+  <!-- ══════════ WORD SCRAMBLE ══════════ -->
+  <div class="game-arena" id="arena-scramble">
+    <div class="game-arena-header">
+      <button class="btn btn-ghost btn-sm" onclick="closeGame()">← Back to Games</button>
+      <h2>🔤 Word Scramble</h2>
+      <div class="game-score-bar">
+        <div class="gsb-item">🏆 Score: <span id="wsScore">0</span></div>
+        <div class="gsb-item">⏱ <span id="wsTimer">60</span>s</div>
+        <div class="gsb-item">🔥 Streak: <span id="wsStreak">0</span></div>
+      </div>
+    </div>
+
+    <div class="scramble-wrapper">
+      <span class="scramble-category" id="wsCategory">Science</span>
+      <p class="scramble-feedback" id="wsFeedback">Tap letters to form the word!</p>
+      <div class="scramble-hint" id="wsHint">Loading hint...</div>
+      <p class="scramble-progress" id="wsProgress">Word 1 of 10</p>
+      <div class="scramble-answer" id="wsAnswer"></div>
+      <div class="scramble-letters" id="wsLetters"></div>
+      <div class="scramble-actions">
+        <button class="btn btn-outline btn-sm" onclick="wsClear()">🗑 Clear</button>
+        <button class="btn btn-ghost btn-sm" onclick="wsSkip()">⏭ Skip</button>
+        <button class="btn btn-primary btn-sm" onclick="wsCheck()">✅ Check</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- CONFETTI -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<script src="app.js"></script>
+<script src="games.js"></script>
+</body>
+</html>

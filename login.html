@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | Dynamic Mastery Assessment</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    /* ── ROLE SWITCHER ── */
+    .role-switcher {
+      display: flex;
+      background: var(--surface);
+      border: 2px solid var(--border-2);
+      border-radius: 50px;
+      padding: 5px;
+      gap: 4px;
+      margin-bottom: 28px;
+    }
+    .role-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 16px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text-2);
+      transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    .role-btn.active {
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(108,99,255,0.35);
+    }
+    .role-btn.role-student.active { background: var(--grad-primary); }
+    .role-btn.role-admin.active   { background: var(--grad-warm); box-shadow: 0 4px 12px rgba(255,101,132,0.35); }
+    .role-btn:hover:not(.active)  { background: var(--surface-2); color: var(--text-1); }
+
+    /* ── ADMIN PANEL BADGE ── */
+    .admin-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg,rgba(255,101,132,0.1),rgba(255,159,67,0.08));
+      border: 1.5px solid rgba(255,101,132,0.25);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--secondary);
+      margin-bottom: 20px;
+      animation: fadeInUp 0.35s ease both;
+    }
+    .admin-badge span:first-child { font-size: 20px; }
+
+    /* ── ADMIN HIGHLIGHT on inputs ── */
+    .admin-mode .form-group input:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 4px rgba(255,101,132,0.12);
+    }
+    .admin-mode .btn-primary {
+      background: var(--grad-warm);
+      box-shadow: 0 4px 0 #a83050;
+    }
+    .admin-mode .btn-primary:hover { box-shadow: 0 7px 0 #a83050; }
+
+    /* ── LEFT PANEL SWAP ── */
+    .auth-left { transition: background 0.4s ease; }
+    .auth-left.admin-left { background: linear-gradient(135deg, #ff6584, #ff9f43); }
+
+    /* ── SECURITY NOTE ── */
+    .security-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: rgba(255,211,61,0.08);
+      border: 1.5px solid rgba(255,211,61,0.2);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-3);
+      margin-top: -8px;
+    }
+    .security-note span:first-child { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── ADMIN-ONLY FIELD SHOW/HIDE ── */
+    .admin-only-field { display: none; animation: fadeInUp 0.3s ease both; }
+    .admin-only-field.visible { display: flex; }
+  </style>
+</head>
+<body class="auth-body">
+
+<div class="auth-page auth-page-login" id="authPage">
+
+  <!-- LEFT PANEL -->
+  <div class="auth-left" id="authLeft">
+    <div class="auth-left-content">
+      <a href="index.html" class="nav-logo auth-logo">
+        <div class="logo-icon">⚡</div>
+        <div class="logo-text">
+          <span class="logo-main">DMA</span>
+          <span class="logo-sub">Dynamic Mastery</span>
+        </div>
+      </a>
+
+      <!-- STUDENT LEFT CONTENT -->
+      <div id="studentLeftContent">
+        <div class="auth-quote">
+          <h2>"Education is the most powerful weapon you can use to change the world."</h2>
+          <p>— Nelson Mandela</p>
+        </div>
+        <div class="auth-features-mini">
+          <div class="afm"><span>✓</span> Pick up where you left off</div>
+          <div class="afm"><span>✓</span> View your mastery progress</div>
+          <div class="afm"><span>✓</span> Continue your study streak 🔥</div>
+        </div>
+      </div>
+
+      <!-- ADMIN LEFT CONTENT -->
+      <div id="adminLeftContent" style="display:none">
+        <div class="auth-quote">
+          <h2>Admin Control Panel</h2>
+          <p>Manage students, questions, and system performance from one place.</p>
+        </div>
+        <div class="auth-features-mini">
+          <div class="afm"><span>👥</span> Manage student accounts</div>
+          <div class="afm"><span>📋</span> Add &amp; review questions</div>
+          <div class="afm"><span>📊</span> View platform analytics</div>
+          <div class="afm"><span>⚙️</span> Configure adaptive rules</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="auth-right">
+    <div class="auth-card" id="loginCard">
+
+      <!-- ROLE SWITCHER -->
+      <div class="role-switcher" id="roleSwitcher">
+        <button class="role-btn role-student active" id="btnStudent" onclick="switchRole('student')">
+          🎓 Student Login
+        </button>
+        <button class="role-btn role-admin" id="btnAdmin" onclick="switchRole('admin')">
+          🛡️ Admin Login
+        </button>
+      </div>
+
+      <!-- STUDENT HEADER -->
+      <div class="auth-card-header" id="studentHeader">
+        <h1>Welcome Back! 👋</h1>
+        <p>Login to continue your practice session</p>
+      </div>
+
+      <!-- ADMIN HEADER -->
+      <div class="auth-card-header hidden" id="adminHeader">
+        <h1>Admin Access 🛡️</h1>
+        <p>Restricted to authorised personnel only</p>
+      </div>
+
+      <!-- ADMIN BADGE (shown only in admin mode) -->
+      <div class="admin-badge hidden" id="adminBadge">
+        <span>🔐</span>
+        <span>You are logging in as an <strong>Administrator</strong>. All actions are logged.</span>
+      </div>
+
+      <!-- FORM -->
+      <!-- BACKEND NOTE: POST to /api/login — include hidden `role` field value -->
+      <form class="auth-form" id="loginForm" action="#" method="POST" novalidate>
+        <!-- Hidden role field — backend reads this to route to student or admin dashboard -->
+        <input type="hidden" name="role" id="roleField" value="student"/>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="yourname@email.com" required/>
+          <span class="field-error" id="err-email"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="password">
+            Password
+            <a href="forgot-password.html" class="forgot-link">Forgot Password?</a>
+          </label>
+          <div class="input-icon-wrap">
+            <input type="password" id="password" name="password" placeholder="Your password" required/>
+            <button type="button" class="toggle-password" onclick="togglePwd('password', this)">👁</button>
+          </div>
+          <span class="field-error" id="err-password"></span>
+        </div>
+
+        <!-- ADMIN ONLY: Secret Access Code -->
+        <div class="form-group admin-only-field" id="adminCodeField">
+          <label for="adminCode">
+            Admin Access Code
+            <span class="optional">Required</span>
+          </label>
+          <div class="input-icon-wrap">
+            <input type="password" id="adminCode" name="admin_code" placeholder="Enter your admin code"/>
+            <button type="button" class="toggle-password" onclick="togglePwd('adminCode', this)">👁</button>
+          </div>
+          <span class="field-error" id="err-adminCode"></span>
+          <div class="security-note">
+            <span>🔒</span>
+            Admin codes are issued by the system owner. Contact your supervisor if you don't have one.
+          </div>
+        </div>
+
+        <div class="form-check">
+          <label class="checkbox-option">
+            <input type="checkbox" name="remember_me" id="rememberMe"/>
+            <span class="checkbox-custom"></span>
+            Remember me on this device
+          </label>
+        </div>
+
+        <div class="server-error hidden" id="serverError"></div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg" id="loginBtn">
+          <span class="btn-text" id="loginBtnText">Login</span>
+          <span class="btn-spinner hidden">⏳</span>
+        </button>
+      </form>
+
+      <!-- STUDENT: link to register -->
+      <p class="auth-switch" id="registerLink">
+        Don't have an account? <a href="register.html">Sign up free</a>
+      </p>
+
+      <!-- ADMIN: note about registration -->
+      <p class="auth-switch hidden" id="adminRegisterNote" style="font-size:12px;color:var(--text-3);">
+        Admin accounts are created by the system owner.<br/>
+        <a href="register.html?role=admin" style="color:var(--secondary);">Request admin access →</a>
+      </p>
+
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  /* ── ROLE SWITCHER LOGIC ── */
+  function switchRole(role) {
+    const isAdmin = role === 'admin';
+
+    // Buttons
+    document.getElementById('btnStudent').classList.toggle('active', !isAdmin);
+    document.getElementById('btnAdmin').classList.toggle('active', isAdmin);
+
+    // Headers
+    document.getElementById('studentHeader').classList.toggle('hidden', isAdmin);
+    document.getElementById('adminHeader').classList.toggle('hidden', !isAdmin);
+
+    // Admin badge
+    document.getElementById('adminBadge').classList.toggle('hidden', !isAdmin);
+
+    // Admin-only fields
+    const codeField = document.getElementById('adminCodeField');
+    codeField.classList.toggle('visible', isAdmin);
+    document.getElementById('adminCode').required = isAdmin;
+
+    // Left panel
+    document.getElementById('authLeft').classList.toggle('admin-left', isAdmin);
+    document.getElementById('studentLeftContent').style.display = isAdmin ? 'none' : 'block';
+    document.getElementById('adminLeftContent').style.display = isAdmin ? 'block' : 'none';
+
+    // Form style
+    document.getElementById('loginForm').classList.toggle('admin-mode', isAdmin);
+
+    // Role hidden field
+    document.getElementById('roleField').value = role;
+
+    // Button text
+    document.getElementById('loginBtnText').textContent = isAdmin ? '🛡️ Access Admin Panel' : 'Login';
+
+    // Footer link swap
+    document.getElementById('registerLink').classList.toggle('hidden', isAdmin);
+    document.getElementById('adminRegisterNote').classList.toggle('hidden', !isAdmin);
+  }
+
+  // Auto-switch if URL param ?role=admin is present
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('role') === 'admin') switchRole('admin');
+</script>
+</body>
+</html>

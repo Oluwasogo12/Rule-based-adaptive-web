@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard | DMA</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    .subject-rings{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:4px}
+    .ring-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-xl);padding:22px 14px 18px;text-align:center;transition:all .3s cubic-bezier(.34,1.56,.64,1);cursor:pointer;position:relative;overflow:hidden}
+    .ring-card:hover{transform:translateY(-6px) scale(1.03);box-shadow:var(--shadow-lg);border-color:var(--border-2)}
+    .ring-wrap{position:relative;width:96px;height:96px;margin:0 auto 12px}
+    .ring-svg{width:96px;height:96px;transform:rotate(-90deg)}
+    .ring-track{fill:none;stroke:var(--bg-3);stroke-width:8}
+    .ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)}
+    .ring-pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .ring-num{font-family:var(--font-display);font-size:20px;line-height:1}
+    .ring-status{font-size:12px;margin-top:2px}
+    .ring-label{font-family:var(--font-display);font-size:13px;margin-bottom:4px}
+    .ring-sublabel{font-size:10px;color:var(--text-3);font-weight:700;margin-bottom:8px}
+    .ring-chips{display:flex;gap:3px;justify-content:center;flex-wrap:wrap}
+    .ring-chip{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;background:var(--bg-3);color:var(--text-3)}
+    .ring-maths .ring-fill{stroke:#6c63ff}.ring-maths .ring-num{color:#6c63ff}
+    .ring-english .ring-fill{stroke:#6bcb77}.ring-english .ring-num{color:#6bcb77}
+    .ring-biology .ring-fill{stroke:#48dbfb}.ring-biology .ring-num{color:#2bb5d8}
+    .ring-chemistry .ring-fill{stroke:#ff6584}.ring-chemistry .ring-num{color:#e03060}
+    .ring-physics .ring-fill{stroke:#ffd93d}.ring-physics .ring-num{color:#c9960a}
+
+    .welcome-banner{background:var(--grad-primary);border-radius:var(--radius-xl);padding:22px 26px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;position:relative;overflow:hidden}
+    .welcome-banner::before{content:'';position:absolute;width:280px;height:280px;background:radial-gradient(circle,rgba(255,255,255,.12),transparent);border-radius:50%;top:-80px;right:-40px;pointer-events:none}
+    .wb-text h2{font-family:var(--font-display);font-size:24px;color:#fff;margin-bottom:4px}
+    .wb-text p{font-size:13px;color:rgba(255,255,255,.8);font-weight:600}
+    .wb-stats{display:flex;gap:12px;flex-shrink:0}
+    .wb-stat{text-align:center;background:rgba(255,255,255,.15);padding:10px 16px;border-radius:12px;backdrop-filter:blur(8px)}
+    .wb-stat-num{font-family:var(--font-display);font-size:20px;color:#fff;display:block}
+    .wb-stat-lbl{font-size:10px;color:rgba(255,255,255,.75);font-weight:700}
+
+    .quick-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+    .qs-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius-lg);padding:18px;display:flex;align-items:center;gap:12px;transition:all var(--transition)}
+    .qs-card:hover{transform:translateY(-3px);border-color:var(--border-2);box-shadow:var(--shadow)}
+    .qs-icon{font-size:26px}
+    .qs-num{font-family:var(--font-display);font-size:26px;line-height:1;display:block}
+    .qs-lbl{font-size:11px;font-weight:700;color:var(--text-3);margin-top:2px}
+
+    .start-cta{background:var(--surface);border:2.5px solid rgba(108,99,255,.25);border-radius:var(--radius-xl);padding:22px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;background:linear-gradient(135deg,rgba(108,99,255,.06),rgba(255,101,132,.04))}
+    .sc-text h3{font-family:var(--font-display);font-size:19px;margin-bottom:5px}
+    .sc-text p{font-size:13px;color:var(--text-2);font-weight:600;margin-bottom:10px}
+    .sc-rules{display:flex;gap:7px;flex-wrap:wrap}
+    .sc-rule{font-size:11px;font-weight:800;padding:3px 10px;border-radius:50px;border:1.5px solid}
+    .scr1{color:#6c63ff;border-color:rgba(108,99,255,.3);background:rgba(108,99,255,.08)}
+    .scr2{color:#6bcb77;border-color:rgba(107,203,119,.3);background:rgba(107,203,119,.08)}
+    .scr3{color:#ff9f43;border-color:rgba(255,159,67,.3);background:rgba(255,159,67,.08)}
+
+    .sessions-wrap{overflow-x:auto}
+    .sessions-tbl{width:100%;border-collapse:collapse}
+    .sessions-tbl th{background:var(--bg-3);color:var(--text-2);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;padding:10px 14px;text-align:left;border-bottom:2px solid var(--border)}
+    .sessions-tbl td{padding:12px 14px;font-size:13px;font-weight:700;border-bottom:1px solid var(--border);vertical-align:middle}
+    .sessions-tbl tr:last-child td{border-bottom:none}
+    .sessions-tbl tr:hover td{background:var(--surface-2)}
+    .subj-cell{display:flex;align-items:center;gap:8px}
+    .subj-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .score-cell{display:flex;align-items:center;gap:8px}
+    .score-bar{flex:1;height:5px;background:var(--bg-3);border-radius:3px;overflow:hidden;min-width:50px}
+    .score-fill{height:100%;border-radius:3px}
+    .mpill{font-size:11px;font-weight:800;padding:3px 9px;border-radius:50px}
+    .mp-up{background:rgba(107,203,119,.15);color:#6bcb77}
+    .mp-dn{background:rgba(255,101,132,.15);color:#ff8fab}
+    .mp-eq{background:rgba(157,163,204,.1);color:var(--text-3)}
+    .rule-badge{font-size:10px;font-weight:800;padding:3px 9px;border-radius:50px;background:rgba(108,99,255,.1);color:var(--primary-light);border:1px solid rgba(108,99,255,.2)}
+
+    @media(max-width:1100px){.subject-rings{grid-template-columns:repeat(3,1fr)}.quick-stats{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:900px){.wb-stats{display:none}.subject-rings{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:600px){
+      .subject-rings{grid-template-columns:repeat(2,1fr);gap:10px}
+      .ring-wrap{width:76px;height:76px}.ring-svg{width:76px;height:76px}.ring-num{font-size:17px}
+      .welcome-banner{flex-direction:column;align-items:flex-start;padding:18px}
+      .start-cta{flex-direction:column;align-items:flex-start}
+      .quick-stats{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body class="dashboard-body">
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text"><span class="logo-main">DMA</span><span class="logo-sub">Mastery</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html" class="sn-item active"><span class="sn-icon">🏠</span><span>Dashboard</span></a>
+    <a href="quiz.html" class="sn-item"><span class="sn-icon">🧠</span><span>Practice Session</span></a>
+    <a href="reports.html" class="sn-item"><span class="sn-icon">📊</span><span>Reports</span></a>
+<a href="materials.html" class="sn-item"><span class="sn-icon">📚</span><span>Study Materials</span></a>
+    <a href="games.html" class="sn-item"><span class="sn-icon">🎮</span><span>Game Zone</span><span class="sn-new">NEW</span></a>
+    <a href="profile.html" class="sn-item"><span class="sn-icon">👤</span><span>Profile</span></a>
+    <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border)"></div>
+    <a href="login.html" class="sn-item sn-logout"><span class="sn-icon">🚪</span><span>Logout</span></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="sidebar-user">
+      <div class="su-avatar">D</div>
+      <div class="su-info"><span class="su-name">David A.</span><span class="su-type">UTME Student</span></div>
+    </div>
+  </div>
+</aside>
+
+<main class="dashboard-main">
+  <header class="dash-header">
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="dash-header-content">
+      <h1 class="dash-welcome">Student Dashboard</h1>
+      <p class="dash-date" id="dashDate"></p>
+    </div>
+    <div class="dash-header-actions">
+      <button class="theme-toggle" id="themeToggle">
+        <span class="toggle-option active" id="darkOpt">🌙</span>
+        <span class="toggle-option" id="lightOpt">☀️</span>
+      </button>
+      <div class="streak-badge">🔥 <span id="streakNum">7</span> Day Streak</div>
+      <a href="quiz.html" class="btn btn-primary btn-sm">▶ Practice</a>
+    </div>
+  </header>
+
+  <div class="dash-content">
+
+    <!-- WELCOME BANNER -->
+    <div class="welcome-banner">
+      <div class="wb-text">
+        <h2>Welcome back, <span id="studentName">Student</span>! 👋</h2>
+        <p>Your adaptive engine is ready. Keep your streak going! 🔥</p>
+      </div>
+      <div class="wb-stats">
+        <div class="wb-stat"><span class="wb-stat-num" id="wbAnswered">247</span><span class="wb-stat-lbl">Questions Done</span></div>
+        <div class="wb-stat"><span class="wb-stat-num" id="wbAcc">71%</span><span class="wb-stat-lbl">Accuracy</span></div>
+        <div class="wb-stat"><span class="wb-stat-num" id="wbSess">18</span><span class="wb-stat-lbl">Sessions</span></div>
+      </div>
+    </div>
+
+    <!-- SUBJECT MASTERY RINGS -->
+    <div class="dash-card">
+      <div class="dc-header">
+        <h2>📈 Subject Mastery Overview</h2>
+        <a href="reports.html" class="dc-link">Full Report →</a>
+      </div>
+      <div class="subject-rings" id="ringsContainer"></div>
+    </div>
+
+    <!-- QUICK STATS -->
+    <div class="quick-stats">
+      <div class="qs-card"><div class="qs-icon">📝</div><div><span class="qs-num" id="qsAnswered">247</span><span class="qs-lbl">Total Answered</span></div></div>
+      <div class="qs-card"><div class="qs-icon">🏆</div><div><span class="qs-num" id="qsMastered">3</span><span class="qs-lbl">Topics Mastered ≥80%</span></div></div>
+      <div class="qs-card"><div class="qs-icon">⚠️</div><div><span class="qs-num" id="qsWeak">4</span><span class="qs-lbl">Weak Topics &lt;60%</span></div></div>
+      <div class="qs-card"><div class="qs-icon">⏱</div><div><span class="qs-num" id="qsTime">14h</span><span class="qs-lbl">Time Studied</span></div></div>
+    </div>
+
+    <!-- START SESSION CTA -->
+    <div class="start-cta">
+      <div class="sc-text">
+        <h3>🚀 Start Adaptive Practice Session</h3>
+        <p>The engine selects questions based on your real-time mastery levels</p>
+        <div class="sc-rules">
+          <span class="sc-rule scr1">R1: Remedial Focus</span>
+          <span class="sc-rule scr2">R2: Progressive Challenge</span>
+          <span class="sc-rule scr3">R3: Spaced Repetition</span>
+        </div>
+      </div>
+      <a href="quiz.html" class="btn btn-fun btn-lg">▶ Start Now 🎯</a>
+    </div>
+
+    <!-- RECENT SESSIONS TABLE -->
+    <div class="dash-card">
+      <div class="dc-header">
+        <h2>📋 Recent Sessions</h2>
+        <a href="reports.html" class="dc-link">View All →</a>
+      </div>
+      <div class="sessions-wrap">
+        <table class="sessions-tbl">
+          <thead><tr>
+            <th>Date</th><th>Subject</th><th>Topic</th><th>Score</th><th>Mastery Change</th><th>Rule Applied</th>
+          </tr></thead>
+          <tbody id="sessionsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="app.js"></script>
+<script>
+const SUBJECTS = [
+  {key:'maths',cls:'ring-maths',label:'Mathematics',emoji:'📐',pct:75,color:'#6c63ff',topics:['Algebra','Calculus','Stats']},
+  {key:'english',cls:'ring-english',label:'English',emoji:'📝',pct:60,color:'#6bcb77',topics:['Comprehension','Essay','Grammar']},
+  {key:'biology',cls:'ring-biology',label:'Biology',emoji:'🧬',pct:45,color:'#48dbfb',topics:['Genetics','Ecology','Cells']},
+  {key:'chemistry',cls:'ring-chemistry',label:'Chemistry',emoji:'⚗️',pct:80,color:'#ff6584',topics:['Organic','Bonding','Redox']},
+  {key:'physics',cls:'ring-physics',label:'Physics',emoji:'⚡',pct:55,color:'#ffd93d',topics:['Mechanics','Waves','Elec']},
+];
+
+const SESSIONS = [
+  {date:'2026-03-01',subject:'Mathematics',topic:'Algebra',score:88,mastery:5,rule:'R2: Challenge'},
+  {date:'2026-02-28',subject:'English Language',topic:'Comprehension',score:72,mastery:2,rule:'R3: Spaced Rep'},
+  {date:'2026-02-26',subject:'Chemistry',topic:'Organic Chem',score:65,mastery:-1,rule:'R1: Remedial'},
+  {date:'2026-02-25',subject:'Biology',topic:'Cell Biology',score:55,mastery:3,rule:'R1: Remedial'},
+  {date:'2026-02-24',subject:'Physics',topic:'Mechanics',score:70,mastery:4,rule:'R2: Challenge'},
+];
+const SUBJ_CLR={Mathematics:'#6c63ff','English Language':'#6bcb77',Biology:'#48dbfb',Chemistry:'#ff6584',Physics:'#ffd93d'};
+
+function buildRings(){
+  const C=document.getElementById('ringsContainer');
+  const r=40,circ=2*Math.PI*r;
+  C.innerHTML=SUBJECTS.map(s=>{
+    const off=circ-(s.pct/100)*circ;
+    const st=s.pct>=80?'🟢 Mastered':s.pct>=60?'🟡 Good':'🔴 Needs Work';
+    return`<div class="ring-card ${s.cls}" onclick="location.href='reports.html'">
+      <div class="ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 96 96">
+          <circle class="ring-track" cx="48" cy="48" r="${r}"/>
+          <circle class="ring-fill" cx="48" cy="48" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="${circ}" data-off="${off}" style="stroke:${s.color}"/>
+        </svg>
+        <div class="ring-pct"><span class="ring-num">${s.pct}%</span></div>
+      </div>
+      <div class="ring-label">${s.emoji} ${s.label}</div>
+      <div class="ring-sublabel">${st}</div>
+      <div class="ring-chips">${s.topics.map(t=>`<span class="ring-chip">${t}</span>`).join('')}</div>
+    </div>`;
+  }).join('');
+  setTimeout(()=>document.querySelectorAll('.ring-fill').forEach(e=>e.style.strokeDashoffset=e.dataset.off),80);
+}
+
+function buildSessions(){
+  document.getElementById('sessionsBody').innerHTML=SESSIONS.map(s=>{
+    const c=SUBJ_CLR[s.subject]||'#6c63ff';
+    const bc=s.score>=80?'#6bcb77':s.score>=60?'#ffd93d':'#ff6584';
+    const mp=s.mastery>0?`<span class="mpill mp-up">+${s.mastery}%</span>`:s.mastery<0?`<span class="mpill mp-dn">${s.mastery}%</span>`:`<span class="mpill mp-eq">—</span>`;
+    return`<tr>
+      <td style="color:var(--text-3);font-size:12px">${s.date}</td>
+      <td><div class="subj-cell"><div class="subj-dot" style="background:${c}"></div>${s.subject}</div></td>
+      <td style="color:var(--text-2)">${s.topic}</td>
+      <td><div class="score-cell"><div class="score-bar"><div class="score-fill" style="width:${s.score}%;background:${bc}"></div></div><strong>${s.score}%</strong></div></td>
+      <td>${mp}</td>
+      <td><span class="rule-badge">${s.rule}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+document.getElementById('dashDate').textContent=new Date().toLocaleDateString('en-NG',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+buildRings();
+buildSessions();
+</script>
+</body>
+</html>

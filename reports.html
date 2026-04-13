@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Performance Reports | DMA</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    /* ── SUBJECT SELECT TOP BAR ── */
+    .reports-topbar {
+      display: flex; align-items: center; gap: 16px;
+      padding: 14px 24px;
+      background: var(--bg-2);
+      border-bottom: 2px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .rpt-label { font-size: 13px; font-weight: 800; color: var(--text-2); }
+    .rpt-select {
+      background: var(--surface); border: 2px solid var(--border-2);
+      border-radius: 12px; padding: 8px 16px; font-size: 14px;
+      font-weight: 800; color: var(--text-1); outline: none;
+      transition: border .2s; cursor: pointer; min-width: 200px;
+    }
+    .rpt-select:focus { border-color: var(--primary); }
+    .rpt-settings { background: var(--surface-2); border: 1.5px solid var(--border-2); border-radius: 10px; padding: 7px 10px; cursor: pointer; font-size: 16px; transition: all var(--transition); }
+    .rpt-settings:hover { border-color: var(--primary); }
+    .rpt-period { display: flex; gap: 6px; }
+    .rpt-period-btn { padding: 6px 14px; border-radius: 50px; font-size: 12px; font-weight: 800; background: var(--surface); border: 1.5px solid var(--border-2); cursor: pointer; color: var(--text-2); transition: all .2s; }
+    .rpt-period-btn.active, .rpt-period-btn:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+    /* ── REPORT GRID ── */
+    .reports-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+    /* ── TOPIC MASTERY BAR CHART ── */
+    .mastery-chart { display: flex; flex-direction: column; gap: 14px; }
+    .mc-item { display: flex; flex-direction: column; gap: 5px; }
+    .mc-header { display: flex; justify-content: space-between; align-items: center; }
+    .mc-topic { font-size: 13px; font-weight: 800; }
+    .mc-pct { font-size: 13px; font-weight: 900; }
+    .mc-bar-track { height: 22px; background: var(--bg-3); border-radius: 8px; overflow: hidden; position: relative; }
+    .mc-bar-fill {
+      height: 100%; border-radius: 8px;
+      display: flex; align-items: center; justify-content: flex-end;
+      padding-right: 8px;
+      font-size: 11px; font-weight: 800; color: rgba(255,255,255,.9);
+      transition: width 1.2s cubic-bezier(.4,0,.2,1);
+      min-width: 30px;
+    }
+    /* Color coding: <40% red, 40-59% orange, 60-79% yellow, >=80% green */
+    .mc-red { background: linear-gradient(90deg, #e53e3e, #fc8181); }
+    .mc-orange { background: linear-gradient(90deg, #d97706, #fbbf24); }
+    .mc-yellow { background: linear-gradient(90deg, #ca8a04, #fde047); }
+    .mc-green { background: linear-gradient(90deg, #16a34a, #4ade80); }
+    .mc-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
+    .mc-leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: var(--text-3); }
+    .mc-leg-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+    /* ── TREND LINE CHART (SVG) ── */
+    .trend-chart-wrap { position: relative; width: 100%; }
+    .trend-svg { width: 100%; overflow: visible; }
+    .trend-axis-lbl { font-size: 10px; fill: var(--text-3); font-family: 'Nunito', sans-serif; font-weight: 700; }
+    .trend-grid-line { stroke: var(--border); stroke-width: 1; stroke-dasharray: 4,4; }
+    .trend-line { fill: none; stroke: var(--primary); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .trend-dot { fill: var(--primary); stroke: var(--bg-2); stroke-width: 2; cursor: pointer; transition: r .2s; }
+    .trend-dot:hover { r: 6; }
+    .trend-area { fill: url(#trendGrad); opacity: .3; }
+    .trend-tooltip {
+      position: absolute; background: var(--surface-3); border: 1.5px solid var(--border-2);
+      padding: 6px 12px; border-radius: 10px; font-size: 12px; font-weight: 800;
+      pointer-events: none; opacity: 0; transition: opacity .2s; white-space: nowrap;
+      color: var(--text-1);
+    }
+
+    /* ── RECOMMENDED FOCUS AREAS ── */
+    .focus-card {
+      background: var(--surface);
+      border: 2.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+    }
+    .fc-title { font-family: var(--font-display); font-size: 19px; margin-bottom: 5px; }
+    .fc-subtitle { font-size: 13px; color: var(--text-3); font-weight: 600; margin-bottom: 20px; }
+    .focus-items { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .focus-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px;
+      background: var(--bg-3);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      transition: all var(--transition);
+    }
+    .focus-item:hover { border-color: var(--border-2); transform: translateX(4px); }
+    .fi-rank { font-family: var(--font-display); font-size: 18px; color: var(--text-3); width: 24px; flex-shrink: 0; }
+    .fi-info { flex: 1; }
+    .fi-topic { font-size: 14px; font-weight: 800; margin-bottom: 2px; }
+    .fi-subject { font-size: 11px; font-weight: 700; color: var(--text-3); }
+    .fi-score {
+      font-family: var(--font-display); font-size: 18px; font-weight: 900;
+      padding: 4px 12px; border-radius: 50px;
+    }
+    .fi-score.bad { color: #e53e3e; background: rgba(229,62,62,.1); }
+    .fi-score.warn { color: #d97706; background: rgba(217,119,6,.1); }
+    .fi-rule-tag { font-size: 10px; font-weight: 800; padding: 2px 9px; border-radius: 50px; background: rgba(108,99,255,.1); color: var(--primary-light); border: 1px solid rgba(108,99,255,.2); margin-left: 6px; }
+    .fc-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 16px; border-top: 1px solid var(--border); }
+    .fc-note { font-size: 13px; font-weight: 600; color: var(--text-3); }
+
+    /* ── OVERVIEW CARDS ── */
+    .overview-cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
+    .ov-c { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 18px 16px; display: flex; gap: 12px; align-items: center; transition: all var(--transition); }
+    .ov-c:hover { transform: translateY(-3px); border-color: var(--border-2); }
+    .ov-c-icon { font-size: 26px; }
+    .ov-c-num { font-family: var(--font-display); font-size: 24px; line-height: 1; display: block; }
+    .ov-c-lbl { font-size: 11px; font-weight: 700; color: var(--text-3); }
+
+    @media(max-width:1100px){ .reports-grid{grid-template-columns:1fr} .overview-cards{grid-template-columns:repeat(2,1fr)} }
+    @media(max-width:600px){
+      .reports-topbar{padding:12px 14px;gap:10px}
+      .rpt-select{min-width:150px;font-size:13px}
+      .reports-grid{grid-template-columns:1fr}
+      .overview-cards{grid-template-columns:1fr 1fr}
+      .fc-bottom{flex-direction:column;align-items:flex-start}
+    }
+  </style>
+</head>
+<body class="dashboard-body">
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text"><span class="logo-main">DMA</span><span class="logo-sub">Mastery</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html" class="sn-item"><span class="sn-icon">🏠</span><span>Dashboard</span></a>
+    <a href="quiz.html" class="sn-item"><span class="sn-icon">🧠</span><span>Practice Session</span></a>
+    <a href="reports.html" class="sn-item active"><span class="sn-icon">📊</span><span>Reports</span></a>
+    <a href="materials.html" class="sn-item"><span class="sn-icon">📚</span><span>Study Materials</span></a>s
+    <a href="games.html" class="sn-item"><span class="sn-icon">🎮</span><span>Game Zone</span><span class="sn-new">NEW</span></a>
+    <a href="profile.html" class="sn-item"><span class="sn-icon">👤</span><span>Profile</span></a>
+    <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border)"></div>
+    <a href="login.html" class="sn-item sn-logout"><span class="sn-icon">🚪</span><span>Logout</span></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="sidebar-user">
+      <div class="su-avatar">D</div>
+      <div class="su-info"><span class="su-name">David A.</span><span class="su-type">UTME Student</span></div>
+    </div>
+  </div>
+</aside>
+
+<main class="dashboard-main">
+  <header class="dash-header">
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="dash-header-content">
+      <h1 class="dash-welcome">📊 Performance Analytics</h1>
+      <p class="dash-date">Track your mastery growth over time</p>
+    </div>
+    <div class="dash-header-actions">
+      <button class="theme-toggle" id="themeToggle">
+        <span class="toggle-option active" id="darkOpt">🌙</span>
+        <span class="toggle-option" id="lightOpt">☀️</span>
+      </button>
+      <a href="quiz.html" class="btn btn-primary btn-sm">▶ Practice</a>
+    </div>
+  </header>
+
+  <!-- SUBJECT SELECTOR TOP BAR -->
+  <div class="reports-topbar">
+    <span class="rpt-label">📚 SELECT SUBJECT:</span>
+    <select class="rpt-select" id="subjectFilter" onchange="updateReports()">
+      <option value="Mathematics">Mathematics (UTME)</option>
+      <option value="English Language">English Language (UTME)</option>
+      <option value="Biology">Biology (UTME)</option>
+      <option value="Chemistry">Chemistry (UTME)</option>
+      <option value="Physics">Physics (UTME)</option>
+    </select>
+    <div class="rpt-period">
+      <button class="rpt-period-btn active" onclick="setPeriod(this,'all')">All Time</button>
+      <button class="rpt-period-btn" onclick="setPeriod(this,'month')">This Month</button>
+      <button class="rpt-period-btn" onclick="setPeriod(this,'week')">This Week</button>
+    </div>
+    <button class="rpt-settings">⚙️</button>
+  </div>
+
+  <div class="dash-content">
+
+    <!-- OVERVIEW CARDS -->
+    <div class="overview-cards">
+      <div class="ov-c"><div class="ov-c-icon">🎯</div><div><span class="ov-c-num" id="ovAcc">71%</span><span class="ov-c-lbl">Overall Accuracy</span></div></div>
+      <div class="ov-c"><div class="ov-c-icon">📝</div><div><span class="ov-c-num" id="ovTotal">247</span><span class="ov-c-lbl">Questions Answered</span></div></div>
+      <div class="ov-c"><div class="ov-c-icon">🏆</div><div><span class="ov-c-num" id="ovMastered">3</span><span class="ov-c-lbl">Topics Mastered</span></div></div>
+      <div class="ov-c"><div class="ov-c-icon">📈</div><div><span class="ov-c-num" id="ovGrowth">+12%</span><span class="ov-c-lbl">Growth This Month</span></div></div>
+    </div>
+
+    <!-- CHARTS GRID -->
+    <div class="reports-grid">
+
+      <!-- LEFT: Topic Mastery Bar Chart -->
+      <div class="dash-card">
+        <div class="dc-header">
+          <h2>📊 Topic Mastery by Subject</h2>
+          <span class="rpt-settings" style="font-size:14px;padding:4px 8px">⚙️</span>
+        </div>
+        <div class="mastery-chart" id="masteryChart"></div>
+        <div class="mc-legend">
+          <div class="mc-leg-item"><div class="mc-leg-dot" style="background:#e53e3e"></div>&lt;40% Weak</div>
+          <div class="mc-leg-item"><div class="mc-leg-dot" style="background:#d97706"></div>40–59%</div>
+          <div class="mc-leg-item"><div class="mc-leg-dot" style="background:#ca8a04"></div>60–79%</div>
+          <div class="mc-leg-item"><div class="mc-leg-dot" style="background:#16a34a"></div>≥80% Mastered</div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Mastery Trend Line Chart -->
+      <div class="dash-card">
+        <div class="dc-header">
+          <h2>📈 Mastery Trend Over Sessions</h2>
+          <span class="rpt-settings" style="font-size:14px;padding:4px 8px">⚙️</span>
+        </div>
+        <div class="trend-chart-wrap" style="position:relative">
+          <svg id="trendSvg" class="trend-svg" style="height:220px"></svg>
+          <div class="trend-tooltip" id="trendTooltip"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--text-3);font-weight:700;padding:0 8px">
+          <span>Session Number (MySQL D4 Data)</span>
+          <span style="transform:rotate(-90deg);position:absolute;left:-30px;top:50%;font-size:10px">Mastery Score (%)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECOMMENDED FOCUS AREAS -->
+    <div class="focus-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div class="fc-title">🎯 Recommended Focus Areas <span style="font-size:13px;font-weight:700;color:var(--text-3)">(Rule 1 — Remedial)</span></div>
+          <div class="fc-subtitle">Topics where your mastery is below 60% — the adaptive engine will prioritise these in your next session</div>
+        </div>
+        <span class="rpt-settings">⚙️</span>
+      </div>
+      <div class="focus-items" id="focusItems"></div>
+      <div class="fc-bottom">
+        <span class="fc-note">Proceed to Practice Session to improve mastery with targeted questions.</span>
+        <a href="quiz.html" class="btn btn-danger">🧠 Start Remedial Practice Session</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="app.js"></script>
+<script>
+/* ════════════════════════════
+   REPORTS PAGE LOGIC
+════════════════════════════ */
+
+// Mock data per subject
+/* ── BACKEND INTEGRATION ──
+   Replace REPORT_DATA with fetch('api/mastery.php?subject='+subjectId)
+   and fetch('api/sessions/trend.php?subject='+subjectId)
+── END ── */
+const REPORT_DATA = {
+  'Mathematics': {
+    topics: [
+      {name:'Algebra',pct:75},{name:'Calculus',pct:45},{name:'Statistics',pct:65},
+      {name:'Geometry',pct:85},{name:'Trigonometry',pct:35},{name:'Sequences',pct:60},
+    ],
+    trend:[22,28,35,38,45,52,57,62,68,75],
+  },
+  'English Language': {
+    topics: [
+      {name:'Comprehension',pct:60},{name:'Essay Writing',pct:55},{name:'Grammar',pct:72},
+      {name:'Summary',pct:48},{name:'Oral Forms',pct:40},{name:'Lexis',pct:65},
+    ],
+    trend:[30,35,40,42,48,50,54,56,59,60],
+  },
+  'Biology': {
+    topics: [
+      {name:'Cell Biology',pct:45},{name:'Genetics',pct:38},{name:'Ecology',pct:52},
+      {name:'Physiology',pct:48},{name:'Evolution',pct:30},{name:'Classification',pct:55},
+    ],
+    trend:[15,18,22,28,30,34,38,40,43,45],
+  },
+  'Chemistry': {
+    topics: [
+      {name:'Organic Chem',pct:80},{name:'Acids & Bases',pct:75},{name:'Bonding',pct:85},
+      {name:'Electrochemistry',pct:68},{name:'Stoichiometry',pct:55},{name:'Kinetics',pct:72},
+    ],
+    trend:[40,48,52,58,63,67,70,74,77,80],
+  },
+  'Physics': {
+    topics: [
+      {name:'Mechanics',pct:55},{name:'Waves',pct:48},{name:'Electricity',pct:60},
+      {name:'Optics',pct:42},{name:'Modern Physics',pct:35},{name:'Thermodynamics',pct:50},
+    ],
+    trend:[20,24,28,32,36,40,44,48,52,55],
+  },
+};
+
+function getPctClass(p) {
+  return p < 40 ? 'mc-red' : p < 60 ? 'mc-orange' : p < 80 ? 'mc-yellow' : 'mc-green';
+}
+function getPctColor(p) {
+  return p < 40 ? '#e53e3e' : p < 60 ? '#d97706' : p < 80 ? '#ca8a04' : '#16a34a';
+}
+
+function buildMasteryChart(topics) {
+  const c = document.getElementById('masteryChart');
+  c.innerHTML = topics.map(t => `
+    <div class="mc-item">
+      <div class="mc-header">
+        <span class="mc-topic">${t.name}</span>
+        <span class="mc-pct" style="color:${getPctColor(t.pct)}">${t.pct}%</span>
+      </div>
+      <div class="mc-bar-track">
+        <div class="mc-bar-fill ${getPctClass(t.pct)}" style="width:0%" data-w="${t.pct}%">${t.pct}%</div>
+      </div>
+    </div>`).join('');
+  setTimeout(() => {
+    c.querySelectorAll('.mc-bar-fill').forEach(el => { el.style.width = el.dataset.w; });
+  }, 80);
+}
+
+function buildTrendChart(trendData) {
+  const svg = document.getElementById('trendSvg');
+  const W = svg.getBoundingClientRect().width || 400;
+  const H = 200, padL = 40, padR = 20, padT = 10, padB = 30;
+  const cW = W - padL - padR, cH = H - padT - padB;
+  const n = trendData.length;
+  const maxV = 100, minV = 0;
+  const pts = trendData.map((v,i) => ({
+    x: padL + (i/(n-1))*cW,
+    y: padT + cH - ((v-minV)/(maxV-minV))*cH,
+    v
+  }));
+  const pathD = pts.map((p,i)=>`${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const areaD = pathD + ` L${pts[pts.length-1].x},${padT+cH} L${pts[0].x},${padT+cH} Z`;
+
+  // Y-axis labels
+  const yLines = [0,25,50,75,100];
+  const yGrid = yLines.map(v => {
+    const y = padT + cH - ((v-minV)/(maxV-minV))*cH;
+    return `<line class="trend-grid-line" x1="${padL}" y1="${y.toFixed(1)}" x2="${W-padR}" y2="${y.toFixed(1)}"/>
+            <text class="trend-axis-lbl" x="${padL-6}" y="${(y+4).toFixed(1)}" text-anchor="end">${v}</text>`;
+  }).join('');
+
+  const xLabels = trendData.map((_,i) => {
+    const x = padL + (i/(n-1))*cW;
+    return `<text class="trend-axis-lbl" x="${x.toFixed(1)}" y="${H-4}" text-anchor="middle">S${i+1}</text>`;
+  }).join('');
+
+  const dots = pts.map((p,i) => `
+    <circle class="trend-dot" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4"
+      onmouseover="showTip(event,'S${i+1}: ${p.v}%')"
+      onmouseout="hideTip()"/>
+    <text class="trend-axis-lbl" x="${p.x.toFixed(1)}" y="${(p.y-10).toFixed(1)}" text-anchor="middle"
+      style="font-size:9px;fill:var(--text-2)">S${i+1}</text>`).join('');
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#6c63ff" stop-opacity=".6"/>
+        <stop offset="100%" stop-color="#6c63ff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    ${yGrid}${xLabels}
+    <path class="trend-area" d="${areaD}"/>
+    <path class="trend-line" d="${pathD}"/>
+    ${dots}`;
+}
+
+function buildFocusAreas(topics) {
+  const weak = topics.filter(t=>t.pct<60).sort((a,b)=>a.pct-b.pct).slice(0,3);
+  const c = document.getElementById('focusItems');
+  if (weak.length===0) {
+    c.innerHTML = `<div style="text-align:center;padding:20px;color:var(--accent-green);font-family:var(--font-display);font-size:18px">🏆 No weak topics! All above 60% mastery</div>`;
+    return;
+  }
+  c.innerHTML = weak.map((t,i) => `
+    <div class="focus-item">
+      <div class="fi-rank">${i+1}.</div>
+      <div class="fi-info">
+        <div class="fi-topic">Weak Topic ${String.fromCharCode(65+i)}: <strong>${t.name}</strong></div>
+        <div class="fi-subject">Needs immediate attention</div>
+      </div>
+      <span class="fi-score ${t.pct<40?'bad':'warn'}">[${t.pct}%]</span>
+      <span class="fi-rule-tag">R1 Remedial</span>
+    </div>`).join('');
+}
+
+window.showTip = function(e, text) {
+  const tip = document.getElementById('trendTooltip');
+  tip.textContent = text; tip.style.opacity = '1';
+  tip.style.left = (e.offsetX + 12)+'px'; tip.style.top = (e.offsetY - 28)+'px';
+};
+window.hideTip = function() { document.getElementById('trendTooltip').style.opacity='0'; };
+
+window.setPeriod = function(el, period) {
+  document.querySelectorAll('.rpt-period-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+};
+
+window.updateReports = function() {
+  const sub = document.getElementById('subjectFilter').value;
+  const data = REPORT_DATA[sub] || REPORT_DATA['Mathematics'];
+  buildMasteryChart(data.topics);
+  buildTrendChart(data.trend);
+  buildFocusAreas(data.topics);
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateReports();
+  // Re-render chart on resize for responsiveness
+  window.addEventListener('resize', updateReports);
+});
+</script>
+</body>
+</html>

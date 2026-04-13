@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dynamic Mastery Assessment | UTME & SSCE Practice</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">
+        <span class="logo-main">DMA</span>
+        <span class="logo-sub">Dynamic Mastery</span>
+      </div>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home" class="nav-link active">Home</a></li>
+      <li><a href="#subjects" class="nav-link">Subjects</a></li>
+      <li><a href="#features" class="nav-link">Features</a></li>
+      <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+      <li><a href="games.html" class="nav-link">🎮 Games</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <span class="toggle-option active" id="darkOpt">🌙</span>
+        <span class="toggle-option" id="lightOpt">☀️</span>
+      </button>
+      <a href="login.html" class="btn btn-ghost btn-sm nav-btn-hide">Login</a>
+      <a href="register.html" class="btn btn-primary btn-sm nav-btn-hide">Get Started Free</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- RIGHT-SIDE MOBILE DRAWER -->
+<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+<div class="mobile-nav-drawer" id="mobileNavDrawer">
+  <div class="mnd-header">
+    <div class="nav-logo">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text"><span class="logo-main">DMA</span></div>
+    </div>
+    <button class="mnd-close" id="mndClose">✕</button>
+  </div>
+  <a href="#home" class="mnd-link active"><span class="mnd-icon">🏠</span> Home</a>
+  <a href="#subjects" class="mnd-link"><span class="mnd-icon">📚</span> Subjects</a>
+  <a href="#features" class="mnd-link"><span class="mnd-icon">✨</span> Features</a>
+  <a href="#how-it-works" class="mnd-link"><span class="mnd-icon">🔄</span> How It Works</a>
+  <a href="games.html" class="mnd-link"><span class="mnd-icon">🎮</span> Game Zone</a>
+  <div class="mnd-divider"></div>
+  <div style="padding: 8px 16px; display:flex; align-items:center; gap:10px;">
+    <span style="font-size:13px;font-weight:700;color:var(--text-3)">Theme:</span>
+    <button class="theme-toggle" style="margin-left:0">
+      <span class="toggle-option active" id="darkOpt">🌙</span>
+      <span class="toggle-option" id="lightOpt">☀️</span>
+    </button>
+  </div>
+  <div class="mnd-actions">
+    <a href="login.html" class="btn btn-outline btn-full">Login</a>
+    <a href="register.html" class="btn btn-primary btn-full">Get Started Free</a>
+  </div>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero" id="home">
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-blob hero-blob-3"></div>
+  <div class="hero-dots"></div>
+  <!-- Floating decorative emojis -->
+  <span class="hero-emoji he-1">📐</span>
+  <span class="hero-emoji he-2">⚗️</span>
+  <span class="hero-emoji he-3">🧬</span>
+  <span class="hero-emoji he-4">⚡</span>
+
+  <div class="hero-container">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      <span>Nigeria's Smartest Exam Prep Platform 🇳🇬</span>
+    </div>
+    <h1 class="hero-title">
+      Study <span class="text-gradient">Smarter.</span><br/>
+      Score <span class="text-gradient">Higher.</span>
+    </h1>
+    <p class="hero-desc">
+      The adaptive system that learns <em>your weaknesses</em> and builds your strengths — 
+      built for UTME and SSCE excellence. Plus a Game Zone to recharge! 🎮
+    </p>
+    <div class="hero-actions">
+      <a href="register.html" class="btn btn-fun btn-lg">
+        Start Practicing Free 🚀
+      </a>
+      <a href="#how-it-works" class="btn btn-outline btn-lg">See How It Works</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-num" data-target="13">0</span>
+        <span class="stat-label">Core Subjects</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-num" data-target="500">0</span>+
+        <span class="stat-label">Practice Questions</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-num" data-target="6">0</span>
+        <span class="stat-label">Adaptive Rules</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-num" data-target="3">0</span>
+        <span class="stat-label">Fun Games</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="floating-card card-mastery">
+      <div class="fc-header"><span class="fc-icon">📊</span><span>Your Mastery</span></div>
+      <div class="mastery-bars">
+        <div class="mbar"><span>Maths</span><div class="mbar-track"><div class="mbar-fill" style="--w:72%"></div></div><span>72%</span></div>
+        <div class="mbar"><span>English</span><div class="mbar-track"><div class="mbar-fill" style="--w:88%"></div></div><span>88%</span></div>
+        <div class="mbar"><span>Biology</span><div class="mbar-track"><div class="mbar-fill" style="--w:55%"></div></div><span>55%</span></div>
+        <div class="mbar"><span>Physics</span><div class="mbar-track"><div class="mbar-fill mbar-warn" style="--w:40%"></div></div><span>40%</span></div>
+        <div class="mbar"><span>Chemistry</span><div class="mbar-track"><div class="mbar-fill" style="--w:65%"></div></div><span>65%</span></div>
+      </div>
+    </div>
+    <div class="floating-card card-question">
+      <div class="fc-header"><span class="fc-icon">🧠</span><span>Adaptive Question</span></div>
+      <p class="q-text">In which organelle does photosynthesis occur?</p>
+      <div class="q-options">
+        <div class="q-opt">A. Mitochondria</div>
+        <div class="q-opt q-correct">B. Chloroplast ✓</div>
+        <div class="q-opt">C. Nucleus</div>
+        <div class="q-opt">D. Ribosome</div>
+      </div>
+    </div>
+    <div class="floating-card card-streak">
+      <span class="streak-icon">🔥</span>
+      <div><div class="streak-num">7 Day Streak!</div><div class="streak-sub">Keep it up! 💪</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SUBJECTS ═══ -->
+<section class="subjects-section" id="subjects">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">📚 Subjects Covered</span>
+      <h2>All Core UTME & SSCE Subjects</h2>
+      <p>Practice across all mandatory subjects with topic-level precision</p>
+    </div>
+    <div class="subjects-grid">
+      <div class="subject-card" data-subject="maths">
+        <span class="sub-icon">📐</span>
+        <h3>Mathematics</h3>
+        <p>Algebra, Calculus, Geometry, Statistics, Trigonometry & more</p>
+        <div class="sub-topics"><span>Quadratic Eqns</span><span>Vectors</span><span>Sequences</span><span>+12 more</span></div>
+        <a href="dashboard.html" class="sub-cta">Practice Now →</a>
+      </div>
+      <div class="subject-card" data-subject="english">
+        <span class="sub-icon">📝</span>
+        <h3>English Language</h3>
+        <p>Comprehension, Lexis & Structure, Oral Forms, Summary Writing</p>
+        <div class="sub-topics"><span>Comprehension</span><span>Essay Writing</span><span>Grammar</span><span>+10 more</span></div>
+        <a href="dashboard.html" class="sub-cta">Practice Now →</a>
+      </div>
+      <div class="subject-card" data-subject="biology">
+        <span class="sub-icon">🧬</span>
+        <h3>Biology</h3>
+        <p>Cell Biology, Genetics, Ecology, Evolution, Physiology & more</p>
+        <div class="sub-topics"><span>Cell Division</span><span>Genetics</span><span>Ecology</span><span>+14 more</span></div>
+        <a href="dashboard.html" class="sub-cta">Practice Now →</a>
+      </div>
+      <div class="subject-card" data-subject="chemistry">
+        <span class="sub-icon">⚗️</span>
+        <h3>Chemistry</h3>
+        <p>Organic Chemistry, Stoichiometry, Periodic Table, Bonding & more</p>
+        <div class="sub-topics"><span>Organic Chem</span><span>Electrochemistry</span><span>Bonding</span><span>+11 more</span></div>
+        <a href="dashboard.html" class="sub-cta">Practice Now →</a>
+      </div>
+      <div class="subject-card" data-subject="physics">
+        <span class="sub-icon">⚡</span>
+        <h3>Physics</h3>
+        <p>Mechanics, Waves, Electricity, Modern Physics, Optics & more</p>
+        <div class="sub-topics"><span>Forces</span><span>Waves</span><span>Electricity</span><span>+13 more</span></div>
+        <a href="dashboard.html" class="sub-cta">Practice Now →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ GAME ZONE TEASER ═══ -->
+<section style="padding:80px 0;background:var(--bg-2);">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">🎮 Game Zone</span>
+      <h2>Study Hard, Play Harder!</h2>
+      <p>After a tough session, recharge with our brain-friendly games — designed to relax and refresh</p>
+    </div>
+    <div class="game-zone-teaser-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:800px;margin:0 auto;">
+      <a href="games.html" style="background:var(--surface);border:2.5px solid var(--border);border-radius:var(--radius-xl);padding:28px;text-align:center;transition:all .3s cubic-bezier(.34,1.56,.64,1);display:block;cursor:pointer;" onmouseover="this.style.transform='translateY(-8px) scale(1.04)';this.style.borderColor='var(--secondary)'" onmouseout="this.style.transform='';this.style.borderColor=''">
+        <div style="font-size:48px;margin-bottom:12px;">🎯</div>
+        <h3 style="font-family:var(--font-display);font-size:18px;margin-bottom:6px;">Tic Tac Toe</h3>
+        <p style="font-size:12px;color:var(--text-3);font-weight:600;">vs AI or Friend</p>
+      </a>
+      <a href="games.html" style="background:var(--surface);border:2.5px solid var(--border);border-radius:var(--radius-xl);padding:28px;text-align:center;transition:all .3s cubic-bezier(.34,1.56,.64,1);display:block;" onmouseover="this.style.transform='translateY(-8px) scale(1.04)';this.style.borderColor='var(--accent-green)'" onmouseout="this.style.transform='';this.style.borderColor=''">
+        <div style="font-size:48px;margin-bottom:12px;">🃏</div>
+        <h3 style="font-family:var(--font-display);font-size:18px;margin-bottom:6px;">Memory Match</h3>
+        <p style="font-size:12px;color:var(--text-3);font-weight:600;">Brain Training</p>
+      </a>
+      <a href="games.html" style="background:var(--surface);border:2.5px solid var(--border);border-radius:var(--radius-xl);padding:28px;text-align:center;transition:all .3s cubic-bezier(.34,1.56,.64,1);display:block;" onmouseover="this.style.transform='translateY(-8px) scale(1.04)';this.style.borderColor='var(--accent-orange)'" onmouseout="this.style.transform='';this.style.borderColor=''">
+        <div style="font-size:48px;margin-bottom:12px;">🔤</div>
+        <h3 style="font-family:var(--font-display);font-size:18px;margin-bottom:6px;">Word Scramble</h3>
+        <p style="font-size:12px;color:var(--text-3);font-weight:600;">Vocab Boost</p>
+      </a>
+    </div>
+    <div style="text-align:center;margin-top:32px;">
+      <a href="games.html" class="btn btn-fun btn-lg">🎮 Go to Game Zone</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FEATURES ═══ -->
+<section class="features-section" id="features">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">✨ Why DMA?</span>
+      <h2>Built Different. Built for You.</h2>
+      <p>Not just another question bank — an intelligent learning partner</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card feature-big">
+        <div><span class="feat-icon">🎯</span></div>
+        <h3>Adaptive Question Selection</h3>
+        <p>Our rule-based engine monitors your performance in real-time and selects questions that match your current level — harder when you're doing well, simpler when you need support.</p>
+        <div class="feat-rule-chips">
+          <span class="chip chip-red">Weak Area Focus</span>
+          <span class="chip chip-green">Progressive Challenge</span>
+          <span class="chip chip-blue">Spaced Repetition</span>
+        </div>
+      </div>
+      <div class="feature-card"><span class="feat-icon">📈</span><h3>Topic-Level Mastery</h3><p>See exactly where you stand on every single topic across all subjects — not just a vague overall score.</p></div>
+      <div class="feature-card"><span class="feat-icon">🔗</span><h3>Cross-Subject Links</h3><p>Master Vectors in Maths? The system auto-introduces Forces in Physics — because knowledge connects!</p></div>
+      <div class="feature-card"><span class="feat-icon">⚡</span><h3>Instant Feedback</h3><p>Every answer gets an explanation — not just ✓ or ✗. Understand <em>why</em> and learn from every mistake.</p></div>
+      <div class="feature-card"><span class="feat-icon">🔑</span><h3>Prerequisite Gating</h3><p>Advanced topics unlock only when you've built the foundation. No skipping steps that will confuse you.</p></div>
+      <div class="feature-card"><span class="feat-icon">🎮</span><h3>Game Zone</h3><p>Three fun, brain-stimulating games to relax after studying. Balance is key to effective learning!</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section class="how-it-works" id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">🔄 The Process</span>
+      <h2>How DMA Works</h2>
+      <p>Four simple steps to smarter exam preparation</p>
+    </div>
+    <div class="steps-container">
+      <div class="step">
+        <div class="step-number">01</div>
+        <h3>Create Your Profile</h3>
+        <p>Sign up, select UTME or SSCE and your target subjects. Under 2 minutes!</p>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-number">02</div>
+        <h3>Take a Diagnostic</h3>
+        <p>A quick quiz helps the system understand your current level before customizing practice.</p>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-number">03</div>
+        <h3>Practice Adaptively</h3>
+        <p>The system serves questions based on your mastery — strengthening weak topics, reinforcing strong ones.</p>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-number">04</div>
+        <h3>Track & Play</h3>
+        <p>Monitor your growth with visual charts, then take a fun break in the Game Zone! 🎮</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ RULES ═══ -->
+<section class="rules-section">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-tag">🤖 Under The Hood</span>
+      <h2>The 6 Adaptive Rules</h2>
+      <p>Transparent intelligence — you can always see why the system makes decisions</p>
+    </div>
+    <div class="rules-grid">
+      <div class="rule-card"><div class="rule-number">R1</div><h4>Remedial Focus</h4><p>Score below 60%? Get easier questions in that topic until your mastery improves.</p><div class="rule-threshold"><span>Threshold:</span> &lt; 60%</div></div>
+      <div class="rule-card"><div class="rule-number">R2</div><h4>Progressive Challenge</h4><p>3 correct answers in a row? The difficulty level automatically increases.</p><div class="rule-threshold"><span>Trigger:</span> 3-streak</div></div>
+      <div class="rule-card"><div class="rule-number">R3</div><h4>Mastery Reinforcement</h4><p>Scored above 80%? Topics are reviewed less often using spaced repetition.</p><div class="rule-threshold"><span>Threshold:</span> &gt; 80%</div></div>
+      <div class="rule-card"><div class="rule-number">R4</div><h4>Prerequisite Validation</h4><p>Advanced topics only unlock after 50%+ mastery of required foundational topics.</p><div class="rule-threshold"><span>Min Mastery:</span> ≥ 50%</div></div>
+      <div class="rule-card"><div class="rule-number">R5</div><h4>Cross-Domain Integration</h4><p>Strong in one topic? Related concepts from other subjects are introduced automatically.</p><div class="rule-threshold"><span>Threshold:</span> &gt; 70%</div></div>
+      <div class="rule-card"><div class="rule-number">R6</div><h4>Balanced Practice</h4><p>Sessions always mix recall, application, and analysis for well-rounded learning.</p><div class="rule-threshold"><span>Based on:</span> Bloom's Taxonomy</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-card">
+      <span class="section-tag">🚀 Ready to Begin?</span>
+      <h2>Your exam is waiting. Are you? 💪</h2>
+      <p>Join students using adaptive practice to ace UTME and SSCE. Free to start — no credit card needed.</p>
+      <div class="cta-actions">
+        <a href="register.html" class="btn btn-white btn-lg">Create Free Account ✨</a>
+        <a href="login.html" class="btn btn-outline-white btn-lg">Already have an account</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo" style="margin-bottom:12px;display:inline-flex;">
+          <div class="logo-icon">⚡</div>
+          <div class="logo-text"><span class="logo-main">DMA</span><span class="logo-sub">Dynamic Mastery</span></div>
+        </a>
+        <p>A rule-based adaptive UTME & SSCE practice system developed at Redeemer's University, Ede.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Platform</h5>
+        <ul>
+          <li><a href="#subjects">Subjects</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="quiz.html">Practice Quiz</a></li>
+          <li><a href="games.html">🎮 Game Zone</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Account</h5>
+        <ul>
+          <li><a href="register.html">Register</a></li>
+          <li><a href="login.html">Login</a></li>
+          <li><a href="admin.html">Admin Dashboard</a></li>
+          <li><a href="profile.html">Profile</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Project Info</h5>
+        <ul>
+          <li><a href="#">Redeemer's University</a></li>
+          <li><a href="#">Faculty of Computing</a></li>
+          <li><a href="#">Supervised by Dr. T.V Igbe</a></li>
+          <li><a href="#">February 2026</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Dynamic Mastery Assessment · Final Year Project — Redeemer's University, Ede, Osun State 🎓</p>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

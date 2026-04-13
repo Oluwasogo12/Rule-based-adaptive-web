@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Practice Session | DMA</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    /* ══ QUIZ LAYOUT ══ */
+    html, body { height: 100%; overflow-x: hidden; }
+    .quiz-wrap { display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ── TOP BAR ── */
+    .qtb {
+      display: flex; align-items: center;
+      background: var(--bg-2); border-bottom: 2px solid var(--border);
+      padding: 0 16px; height: 60px;
+      position: sticky; top: 0; z-index: 100;
+      flex-shrink: 0; gap: 8px; overflow: hidden;
+    }
+    .qtb-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; padding-right: 14px; border-right: 1.5px solid var(--border); flex-shrink: 0; }
+    .qtb-logo-icon { width: 32px; height: 32px; background: var(--grad-primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+    .qtb-logo-text { font-family: var(--font-display); font-size: 18px; color: var(--text-1); }
+    .qtb-meta { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
+    .qtb-pill { display: flex; flex-direction: column; padding: 0 14px; border-right: 1.5px solid var(--border); }
+    .qtb-pill-label { font-size: 10px; color: var(--text-3); font-weight: 800; text-transform: uppercase; letter-spacing: .5px; }
+    .qtb-pill-value { font-family: var(--font-display); font-size: 14px; color: var(--text-1); white-space: nowrap; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+    .qtb-progress-wrap { flex: 1; padding: 0 14px; min-width: 0; border-right: 1.5px solid var(--border); }
+    .qtb-count { font-size: 12px; font-weight: 800; color: var(--text-2); margin-bottom: 4px; }
+    .qtb-bar { height: 5px; background: var(--bg-3); border-radius: 3px; overflow: hidden; }
+    .qtb-bar-fill { height: 100%; background: var(--grad-primary); border-radius: 3px; transition: width .5s ease; }
+    .qtb-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; padding-left: 10px; }
+    .qtb-timer { font-size: 12px; font-weight: 800; color: var(--text-2); background: var(--surface-2); padding: 4px 10px; border-radius: 50px; border: 1.5px solid var(--border-2); white-space: nowrap; }
+    .qtb-timer.warn { color: var(--danger); border-color: rgba(255,101,132,.4); }
+    .qtb-home-btn { background: var(--surface-2); border: 1.5px solid var(--border-2); border-radius: 10px; padding: 6px 12px; font-size: 12px; font-weight: 800; color: var(--text-2); cursor: pointer; text-decoration: none; white-space: nowrap; transition: all .2s; }
+    .qtb-home-btn:hover { border-color: var(--primary); color: var(--primary-light); }
+    .qtb-ham { background: var(--surface-2); border: 1.5px solid var(--border-2); border-radius: 10px; padding: 7px 9px; font-size: 16px; cursor: pointer; display: none; flex-shrink: 0; }
+
+    /* ── BODY: sidebar + content ── */
+    .quiz-body { display: flex; flex: 1; }
+
+    /* ── SIDEBAR ── */
+    .quiz-sb {
+      width: 190px; flex-shrink: 0;
+      background: var(--bg-2); border-right: 2px solid var(--border);
+      display: flex; flex-direction: column; padding: 16px 0;
+      position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto;
+    }
+    .qsb-link { display: flex; align-items: center; gap: 10px; padding: 11px 18px; font-size: 13px; font-weight: 700; color: var(--text-2); transition: all .2s; text-decoration: none; }
+    .qsb-link:hover { background: var(--surface-2); color: var(--text-1); }
+    .qsb-link.active { background: linear-gradient(135deg, rgba(108,99,255,.12), rgba(108,99,255,.05)); color: var(--primary-light); border-left: 3px solid var(--primary); }
+    .qsb-divider { height: 1px; background: var(--border); margin: 8px 14px; }
+    .qsb-bottom { margin-top: auto; }
+
+    /* ── MOBILE SIDEBAR OVERLAY ── */
+    .qsb-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55);
+      backdrop-filter: blur(3px); z-index: 200;
+    }
+    .qsb-overlay.open { display: block; }
+    .quiz-sb.mobile-open { transform: translateX(0) !important; box-shadow: 4px 0 40px rgba(0,0,0,.5); }
+
+    /* ── MAIN CONTENT ── */
+    .quiz-content { flex: 1; padding: 24px; overflow-y: auto; min-width: 0; }
+
+    /* ── SCREENS ── */
+    .qscreen { display: none; }
+    .qscreen.active { display: block; }
+
+    /* ── SETUP SCREEN ── */
+    .setup-wrap { max-width: 660px; margin: 0 auto; }
+    .setup-header { text-align: center; margin-bottom: 28px; }
+    .setup-header h1 { font-family: var(--font-display); font-size: 30px; margin-bottom: 6px; }
+    .setup-header p { color: var(--text-2); font-size: 14px; font-weight: 600; }
+    .setup-card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius-xl); padding: 26px; display: flex; flex-direction: column; gap: 20px; }
+    .sf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .sf-group { display: flex; flex-direction: column; gap: 7px; }
+    .sf-group label { font-size: 12px; font-weight: 800; color: var(--text-2); text-transform: uppercase; letter-spacing: .5px; }
+    .sf-group select { background: var(--bg-3); border: 2px solid var(--border-2); border-radius: 12px; padding: 11px 14px; font-size: 14px; font-weight: 700; color: var(--text-1); outline: none; transition: border .2s; font-family: var(--font); }
+    .sf-group select:focus { border-color: var(--primary); }
+    .mode-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .mode-btn { padding: 14px 8px; border: 2.5px solid var(--border-2); border-radius: 14px; text-align: center; cursor: pointer; transition: all .2s; font-size: 12px; font-weight: 800; color: var(--text-2); background: var(--surface-2); }
+    .mode-btn:hover, .mode-btn.sel { border-color: var(--primary); background: rgba(108,99,255,.08); color: var(--primary-light); }
+    .mode-btn .mi { font-size: 22px; display: block; margin-bottom: 5px; }
+    .numq-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .numq-btn { padding: 8px 18px; border-radius: 50px; font-size: 14px; font-weight: 800; background: var(--bg-3); color: var(--text-2); border: 2px solid var(--border-2); cursor: pointer; transition: all .2s; }
+    .numq-btn:hover, .numq-btn.sel { background: var(--primary); border-color: var(--primary); color: #fff; transform: translateY(-2px); box-shadow: 0 4px 0 var(--primary-dark); }
+
+    /* ── ACTIVE QUIZ ── */
+    .session-prog { margin-bottom: 20px; }
+    .sp-bar { height: 7px; background: var(--bg-3); border-radius: 4px; overflow: hidden; }
+    .sp-fill { height: 100%; background: var(--grad-primary); border-radius: 4px; transition: width .6s ease; }
+    .sp-lbl { font-size: 11px; font-weight: 800; color: var(--text-3); text-align: right; margin-top: 4px; }
+    .q-card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius-xl); padding: 24px; margin-bottom: 18px; }
+    .q-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 12px; }
+    .q-tag { font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 50px; }
+    .qt-diff { background: rgba(255,211,61,.12); color: #c8960a; }
+    .qt-subj { background: rgba(108,99,255,.12); color: #a78bfa; }
+    .qt-topic { background: rgba(107,203,119,.12); color: #5ab869; }
+    .q-num-lbl { font-size: 11px; font-weight: 800; color: var(--text-3); margin-bottom: 8px; }
+    .q-text { font-size: 18px; font-weight: 700; line-height: 1.65; color: var(--text-1); }
+
+    /* ── RADIO OPTIONS ── */
+    .opts-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .opt-lbl {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; background: var(--surface);
+      border: 2px solid var(--border-2); border-radius: 14px;
+      cursor: pointer; transition: all .2s; font-size: 15px; font-weight: 700;
+      position: relative; user-select: none;
+    }
+    .opt-lbl:hover { border-color: var(--primary); background: rgba(108,99,255,.04); }
+    .opt-lbl input[type=radio] { display: none; }
+    .opt-circle { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--border-2); flex-shrink: 0; transition: all .2s; position: relative; }
+    .opt-lbl:has(input:checked) .opt-circle { border-color: var(--primary); }
+    .opt-lbl:has(input:checked) .opt-circle::after { content: ''; position: absolute; width: 10px; height: 10px; background: var(--primary); border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+    .opt-lbl:has(input:checked) { border-color: var(--primary); background: rgba(108,99,255,.06); }
+    .opt-letter { width: 28px; height: 28px; border-radius: 8px; background: var(--bg-3); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; flex-shrink: 0; transition: all .2s; }
+    .opt-lbl:has(input:checked) .opt-letter { background: rgba(108,99,255,.2); color: var(--primary-light); }
+    /* Post-submit states */
+    .opt-lbl.correct { border-color: var(--accent-green) !important; background: rgba(107,203,119,.08) !important; }
+    .opt-lbl.wrong   { border-color: var(--danger) !important; background: rgba(255,101,132,.07) !important; }
+    .opt-lbl.correct .opt-letter { background: rgba(107,203,119,.2); color: var(--accent-green); }
+    .opt-lbl.wrong   .opt-letter { background: rgba(255,101,132,.2); color: var(--danger); }
+    .opt-lbl.correct::after { content: '✓'; position: absolute; right: 14px; font-weight: 900; color: var(--accent-green); font-size: 16px; }
+    .opt-lbl.wrong::after   { content: '✗'; position: absolute; right: 14px; font-weight: 900; color: var(--danger); font-size: 16px; }
+
+    /* ── SUBMIT ROW ── */
+    .submit-row { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+    .streak-mini { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 800; background: rgba(255,211,61,.12); color: #c8960a; padding: 6px 14px; border-radius: 50px; }
+
+    /* ── FEEDBACK PANEL ── */
+    .fb-panel {
+      border: 2px solid var(--border-2); border-radius: var(--radius-xl); overflow: hidden;
+      margin-bottom: 20px; animation: popIn .3s cubic-bezier(.34,1.56,.64,1);
+    }
+    .fb-inner { display: grid; grid-template-columns: 200px 1fr; }
+    .fb-left {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 24px 16px; gap: 10px; border-right: 2px solid var(--border);
+    }
+    .fb-correct { background: rgba(107,203,119,.08); }
+    .fb-wrong   { background: rgba(255,101,132,.06); }
+    .fb-icon { font-size: 50px; }
+    .fb-verdict { font-family: var(--font-display); font-size: 26px; }
+    .fv-correct { color: var(--accent-green); }
+    .fv-wrong   { color: var(--danger); }
+    .fb-pts { font-size: 12px; font-weight: 800; background: var(--surface-2); padding: 4px 12px; border-radius: 50px; color: var(--text-2); }
+    .fb-right { padding: 20px; background: var(--surface); }
+    .fb-your-ans { font-size: 11px; font-weight: 800; color: var(--text-3); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px; }
+    .fb-ans-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: 12px; margin-bottom: 8px;
+      font-size: 14px; font-weight: 800; border: 2px solid;
+    }
+    .fb-ans-correct { background: rgba(107,203,119,.1); border-color: rgba(107,203,119,.3); color: var(--accent-green); }
+    .fb-ans-wrong   { background: rgba(255,101,132,.08); border-color: rgba(255,101,132,.2); color: var(--danger); }
+    .fb-rule { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 50px; background: rgba(108,99,255,.1); color: var(--primary-light); border: 1px solid rgba(108,99,255,.2); margin-bottom: 12px; display: inline-block; }
+    .fb-expl { background: var(--bg-3); border: 1.5px solid var(--border-2); border-radius: var(--radius); padding: 13px 15px; font-size: 13px; font-weight: 600; color: var(--text-2); line-height: 1.65; margin-bottom: 14px; }
+    .fb-expl strong { color: var(--text-1); }
+
+    /* ── RESULTS SCREEN ── */
+    .results-wrap { max-width: 680px; margin: 0 auto; text-align: center; padding: 20px 0; }
+    .rs-emoji { font-size: 72px; display: block; margin-bottom: 14px; animation: bounce 1s; }
+    .rs-title { font-family: var(--font-display); font-size: 34px; margin-bottom: 6px; }
+    .rs-sub { font-size: 15px; color: var(--text-2); font-weight: 600; margin-bottom: 24px; }
+    .rs-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 22px; }
+    .rs-stat { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 16px 12px; }
+    .rs-stat-n { font-family: var(--font-display); font-size: 26px; display: block; margin-bottom: 3px; }
+    .rs-stat-l { font-size: 11px; font-weight: 700; color: var(--text-3); }
+    .rs-adaptive { background: rgba(108,99,255,.07); border: 2px solid rgba(108,99,255,.18); border-radius: var(--radius-lg); padding: 15px 18px; margin-bottom: 20px; text-align: left; font-size: 13px; font-weight: 700; color: var(--text-2); line-height: 1.65; }
+    .rs-adaptive strong { color: var(--primary-light); }
+    .rs-breakdown { text-align: left; background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 22px; }
+    .rs-bd-title { font-family: var(--font-display); font-size: 15px; margin-bottom: 10px; }
+    .rs-bd-item { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; }
+    .rs-bd-item:last-child { border-bottom: none; }
+    .rs-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .rs-q-text { flex: 1; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rs-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 900px) {
+      .quiz-sb {
+        position: fixed; top: 0; left: 0; height: 100vh; z-index: 201;
+        transform: translateX(-100%); transition: transform .3s ease;
+      }
+      .qtb-ham { display: flex; }
+      .qtb-meta .qtb-pill:not(:first-child) { display: none; }
+    }
+    @media (max-width: 680px) {
+      .qtb { height: 54px; padding: 0 12px; }
+      .qtb-logo-text { display: none; }
+      .qtb-meta { display: none; }
+      .qtb-progress-wrap { border-right: none; }
+      .qtb-home-btn span { display: none; }
+      .quiz-content { padding: 14px; }
+      .fb-inner { grid-template-columns: 1fr; }
+      .fb-left { flex-direction: row; padding: 14px 16px; border-right: none; border-bottom: 2px solid var(--border); justify-content: flex-start; gap: 14px; }
+      .fb-icon { font-size: 32px; }
+      .fb-verdict { font-size: 20px; }
+      .q-text { font-size: 15px; }
+      .opt-lbl { padding: 12px 14px; font-size: 14px; }
+      .rs-grid { grid-template-columns: 1fr 1fr; }
+      .sf-row { grid-template-columns: 1fr; }
+      .mode-grid { grid-template-columns: 1fr; }
+      .setup-header h1 { font-size: 24px; }
+    }
+    @media (max-width: 420px) {
+      .quiz-content { padding: 10px; }
+      .q-card { padding: 16px; }
+      .q-text { font-size: 14px; }
+      .opt-lbl { padding: 10px 12px; font-size: 13px; gap: 10px; }
+      .opt-circle { width: 18px; height: 18px; }
+      .opt-letter { width: 24px; height: 24px; font-size: 11px; }
+      .numq-row { gap: 6px; }
+      .numq-btn { padding: 7px 14px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body class="dashboard-body">
+
+<!-- MOBILE SIDEBAR OVERLAY -->
+<div class="qsb-overlay" id="qsbOverlay"></div>
+
+<div class="quiz-wrap">
+
+  <!-- ── TOP BAR ── -->
+  <header class="qtb">
+    <button class="qtb-ham" id="qsbToggle" aria-label="Menu">☰</button>
+    <a href="dashboard.html" class="qtb-logo">
+      <div class="qtb-logo-icon">⚡</div>
+      <span class="qtb-logo-text">DMA</span>
+    </a>
+    <div class="qtb-meta">
+      <div class="qtb-pill">
+        <span class="qtb-pill-label">Subject</span>
+        <span class="qtb-pill-value" id="qtbSubject">—</span>
+      </div>
+      <div class="qtb-pill">
+        <span class="qtb-pill-label">Exam</span>
+        <span class="qtb-pill-value" id="qtbTopic">—</span>
+      </div>
+    </div>
+    <div class="qtb-progress-wrap">
+      <div class="qtb-count" id="qtbCount">Setup</div>
+      <div class="qtb-bar"><div class="qtb-bar-fill" id="qtbFill" style="width:0%"></div></div>
+    </div>
+    <div class="qtb-right">
+      <div class="qtb-timer" id="qtbTimer">⏱ 00:00</div>
+      <button class="theme-toggle" id="themeToggle" style="flex-shrink:0">
+        <span class="toggle-option active" id="darkOpt">🌙</span>
+        <span class="toggle-option" id="lightOpt">☀️</span>
+      </button>
+      <a href="dashboard.html" class="qtb-home-btn">🏠 <span>Dashboard</span></a>
+    </div>
+  </header>
+
+  <!-- ── BODY ── -->
+  <div class="quiz-body">
+
+    <!-- Sidebar nav -->
+    <nav class="quiz-sb" id="quizSidebar">
+      <a href="dashboard.html" class="qsb-link"><span>🏠</span> Dashboard</a>
+      <a href="quiz.html" class="qsb-link active"><span>🧠</span> Practice</a>
+<a href="materials.html" class="sn-item"><span class="sn-icon">📚</span><span>Study Materials</span></a>
+      <a href="reports.html" class="qsb-link"><span>📊</span> Reports</a>
+      <a href="games.html" class="qsb-link"><span>🎮</span> Game Zone</a>
+      <a href="profile.html" class="qsb-link"><span>👤</span> Profile</a>
+      <div class="qsb-divider"></div>
+      <div class="qsb-bottom">
+        <a href="login.html" class="qsb-link" style="color:var(--danger)"><span>🚪</span> Logout</a>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <div class="quiz-content">
+
+      <!-- ══ SCREEN: SETUP ══ -->
+      <div class="qscreen active" id="screenSetup">
+        <div class="setup-wrap">
+          <div class="setup-header">
+            <h1>🧠 Start Practice Session</h1>
+            <p>Select your subject, exam type, and year to begin</p>
+          </div>
+          <div class="setup-card">
+            <div class="sf-row">
+              <div class="sf-group">
+                <label>📚 Subject</label>
+                <select id="sfSubject">
+                  <option value="">Any Subject (Adaptive)</option>
+                  <option value="Mathematics">Mathematics</option>
+                  <option value="English Language">English Language</option>
+                  <option value="Biology">Biology</option>
+                  <option value="Chemistry">Chemistry</option>
+                  <option value="Physics">Physics</option>
+                </select>
+              </div>
+              <div class="sf-group">
+                <label>🎓 Exam Type</label>
+                <select id="sfExamType">
+                  <option value="JAMB">JAMB (UTME)</option>
+                  <option value="WAEC">WAEC (SSCE)</option>
+                </select>
+              </div>
+            </div>
+            <div class="sf-group">
+              <label>📅 Year</label>
+              <div class="numq-row">
+                <div class="numq-btn sel" onclick="pickYear(this)">2020</div>
+                <div class="numq-btn" onclick="pickYear(this)">2021</div>
+                <div class="numq-btn" onclick="pickYear(this)">2022</div>
+                <div class="numq-btn" onclick="pickYear(this)">2023</div>
+                <div class="numq-btn" onclick="pickYear(this)">2024</div>
+              </div>
+            </div>
+            <button class="btn btn-fun btn-full btn-lg" onclick="startSession()">
+              🚀 Start Practice Session
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SCREEN: ACTIVE QUIZ ══ -->
+      <div class="qscreen" id="screenQuiz">
+        <div class="session-prog">
+          <div class="sp-bar"><div class="sp-fill" id="spFill" style="width:0%"></div></div>
+          <div class="sp-lbl" id="spLbl"></div>
+        </div>
+
+        <div class="q-card">
+          <div class="q-tags">
+            <span class="q-tag qt-diff" id="tagDiff">Medium</span>
+            <span class="q-tag qt-subj" id="tagSubj">MCQ</span>
+            <span class="q-tag qt-topic" id="tagTopic">Algebra</span>
+          </div>
+          <div class="q-num-lbl" id="qNumLbl">Question 1 of 10</div>
+          <div class="q-text" id="qText">Loading…</div>
+        </div>
+
+        <div class="opts-list" id="optsList"></div>
+
+        <div class="submit-row">
+          <button class="btn btn-primary btn-lg" id="submitBtn" onclick="submitAnswer()">Submit Answer</button>
+          <div class="streak-mini" id="streakBadge" style="display:none">🔥 <span id="streakNum">0</span> streak</div>
+        </div>
+
+        <div id="fbPanel" style="display:none"></div>
+      </div>
+
+      <!-- ══ SCREEN: RESULTS ══ -->
+      <div class="qscreen" id="screenResults">
+        <div class="results-wrap">
+          <span class="rs-emoji" id="rsEmoji">🎉</span>
+          <h1 class="rs-title" id="rsTitle">Session Complete!</h1>
+          <p class="rs-sub" id="rsSub"></p>
+          <div class="rs-grid" id="rsGrid"></div>
+          <div class="rs-adaptive" id="rsAdaptive"></div>
+          <div class="rs-breakdown" id="rsBreakdown"></div>
+          <div class="rs-btns">
+            <button class="btn btn-fun btn-lg" onclick="resetToSetup()">🔄 New Session</button>
+            <a href="reports.html" class="btn btn-primary btn-lg">📊 View Report</a>
+            <a href="dashboard.html" class="btn btn-outline btn-lg">🏠 Dashboard</a>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end quiz-content -->
+  </div><!-- end quiz-body -->
+</div><!-- end quiz-wrap -->
+
+<script src="app.js"></script>
+<script>
+/* ════════════════════════════════════
+   QUIZ SESSION ENGINE
+════════════════════════════════════ */
+
+// ── Sidebar mobile toggle ──
+(function() {
+  const toggle = document.getElementById('qsbToggle');
+  const sb = document.getElementById('quizSidebar');
+  const ov = document.getElementById('qsbOverlay');
+  toggle?.addEventListener('click', () => {
+    sb.classList.toggle('mobile-open');
+    ov.classList.toggle('open');
+    document.body.style.overflow = sb.classList.contains('mobile-open') ? 'hidden' : '';
+  });
+  ov?.addEventListener('click', () => {
+    sb.classList.remove('mobile-open');
+    ov.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+  sb?.querySelectorAll('.qsb-link').forEach(l => l.addEventListener('click', () => {
+    if (window.innerWidth <= 900) {
+      sb.classList.remove('mobile-open');
+      ov.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  }));
+})();
+
+// ── Year picker ──
+let sessionYear = 2020;
+function pickYear(el) {
+  document.querySelectorAll('.numq-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  sessionYear = parseInt(el.textContent);
+}
+
+// ── Screen switcher ──
+function showScreen(id) {
+  document.querySelectorAll('.qscreen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Question bank ──
+const QUESTIONS = [
+  { text:'If x² − 4 = 0, find the value of x where x > 0.', opts:['A) −2','B) 2','C) 0','D) 4'], ans:'B', exp:'Since x²−4=0, x²=4, so x=±2. Since x>0, x = 2 is the answer.', diff:'Medium', subj:'Mathematics', topic:'Algebra' },
+  { text:'Which organelle is responsible for photosynthesis in plant cells?', opts:['A) Mitochondria','B) Ribosome','C) Chloroplast','D) Nucleus'], ans:'C', exp:'Chloroplasts contain chlorophyll and are the site of photosynthesis, converting light energy to glucose.', diff:'Easy', subj:'Biology', topic:'Cell Biology' },
+  { text:'What is the speed of light in a vacuum?', opts:['A) 3×10⁶ m/s','B) 3×10⁸ m/s','C) 3×10¹⁰ m/s','D) 3×10⁴ m/s'], ans:'B', exp:'The speed of light in a vacuum is approximately 3×10⁸ metres per second.', diff:'Easy', subj:'Physics', topic:'Waves & Light' },
+  { text:'In a solution with pH 3, what is the concentration of H⁺ ions (mol/L)?', opts:['A) 10⁻¹¹','B) 10⁻³','C) 10³','D) 10⁻⁷'], ans:'B', exp:'pH = −log[H⁺], so pH=3 means [H⁺] = 10⁻³ mol/L.', diff:'Medium', subj:'Chemistry', topic:'Acids & Bases' },
+  { text:'Which sentence contains a grammatical error?', opts:['A) She has been waiting for two hours.','B) They was playing football yesterday.','C) He went to the market.','D) I have finished my homework.'], ans:'B', exp:'"They" requires "were", not "was". Correct: "They were playing football yesterday."', diff:'Easy', subj:'English Language', topic:'Grammar' },
+  { text:'A body moves with uniform velocity. What is the net force on it?', opts:['A) Equal to weight','B) Greater than zero','C) Zero','D) Cannot be determined'], ans:'C', exp:"By Newton's First Law, constant velocity means zero acceleration, so net force = zero.", diff:'Medium', subj:'Physics', topic:'Mechanics' },
+  { text:'If log₂(x) = 5, what is the value of x?', opts:['A) 10','B) 25','C) 32','D) 64'], ans:'C', exp:'log₂(x)=5 means 2⁵=x. Therefore x = 32.', diff:'Hard', subj:'Mathematics', topic:'Logarithms' },
+  { text:'What is the chemical formula for glucose?', opts:['A) C₁₂H₂₂O₁₁','B) C₆H₁₂O₆','C) CH₄','D) C₂H₅OH'], ans:'B', exp:'Glucose (a monosaccharide) has the formula C₆H₁₂O₆.', diff:'Easy', subj:'Chemistry', topic:'Organic Chemistry' },
+  { text:'Which process describes water moving across a semi-permeable membrane from low to high solute concentration?', opts:['A) Diffusion','B) Active Transport','C) Osmosis','D) Facilitated Diffusion'], ans:'C', exp:'Osmosis is the movement of water across a semi-permeable membrane down the water potential gradient.', diff:'Medium', subj:'Biology', topic:'Cell Transport' },
+  { text:'A UTME candidate scored 280 out of 400. What percentage is this?', opts:['A) 65%','B) 70%','C) 72%','D) 75%'], ans:'B', exp:'(280÷400)×100 = 70%.', diff:'Easy', subj:'Mathematics', topic:'Percentages' },
+];
+
+// ── Session state ──
+const S = { questions:[], idx:0, answers:[], streak:0, year:2020, elapsed:0, timer:null, submitted:false };
+
+function startSession() {
+  const sub = document.getElementById('sfSubject').value;
+  const examType = document.getElementById('sfExamType').value;
+  S.year = sessionYear;
+  S.examType = examType;
+  S.questions = [...QUESTIONS].sort(() => Math.random() - .5);
+  S.idx = 0; S.answers = []; S.streak = 0; S.elapsed = 0; S.submitted = false;
+
+  document.getElementById('qtbSubject').textContent = sub || 'Mixed';
+  document.getElementById('qtbTopic').textContent = examType + ' ' + S.year;
+
+  clearInterval(S.timer);
+  S.timer = setInterval(() => {
+    S.elapsed++;
+    const m = String(Math.floor(S.elapsed/60)).padStart(2,'0');
+    const sec = String(S.elapsed%60).padStart(2,'0');
+    const el = document.getElementById('qtbTimer');
+    el.textContent = `⏱ ${m}:${sec}`;
+    if (S.elapsed > 1800) el.classList.add('warn'); else el.classList.remove('warn');
+  }, 1000);
+
+  showScreen('screenQuiz');
+  renderQ();
+}
+
+function renderQ() {
+  const q = S.questions[S.idx];
+  const n = S.idx + 1, tot = S.questions.length;
+  S.submitted = false;
+
+  // Top bar
+  document.getElementById('qtbCount').textContent = `Question ${n} of ${tot}`;
+  document.getElementById('qtbFill').style.width = `${((n-1)/tot)*100}%`;
+  document.getElementById('qtbSubject').textContent = q.subj;
+  document.getElementById('qtbTopic').textContent = S.year;
+
+  // Progress
+  document.getElementById('spFill').style.width = `${((n-1)/tot)*100}%`;
+  document.getElementById('spLbl').textContent = `Question ${n} of ${tot} · ${tot-(n-1)} remaining`;
+
+  // Tags + text
+  document.getElementById('tagDiff').textContent = q.diff;
+  document.getElementById('tagSubj').textContent = q.subj;
+  document.getElementById('tagTopic').textContent = q.topic;
+  document.getElementById('qNumLbl').textContent = `Question ${n} of ${tot}`;
+  document.getElementById('qText').textContent = q.text;
+
+  // Options
+  const LTRS = ['A','B','C','D'];
+  document.getElementById('optsList').innerHTML = q.opts.map((opt, i) => `
+    <label class="opt-lbl" id="opt${i}">
+      <input type="radio" name="qans" value="${LTRS[i]}">
+      <div class="opt-circle"></div>
+      <div class="opt-letter">${LTRS[i]}</div>
+      <span>${opt.substring(3)}</span>
+    </label>`).join('');
+
+  // Reset submit/feedback
+  const sb = document.getElementById('submitBtn');
+  sb.disabled = false; sb.textContent = 'Submit Answer';
+  const fp = document.getElementById('fbPanel');
+  fp.style.display = 'none'; fp.innerHTML = '';
+
+  // Streak badge
+  const badge = document.getElementById('streakBadge');
+  if (S.streak > 1) { badge.style.display='flex'; document.getElementById('streakNum').textContent=S.streak; }
+  else badge.style.display='none';
+}
+
+function submitAnswer() {
+  if (S.submitted) return;
+  const sel = document.querySelector('input[name="qans"]:checked');
+  if (!sel) {
+    const sb = document.getElementById('submitBtn');
+    sb.textContent = '⚠️ Please pick an answer!';
+    setTimeout(() => { sb.textContent = 'Submit Answer'; }, 1500);
+    return;
+  }
+  S.submitted = true;
+
+  const q = S.questions[S.idx];
+  const chosen = sel.value;
+  const correct = chosen === q.ans;
+  if (correct) S.streak++; else S.streak = 0;
+  S.answers.push({ q, chosen, correct });
+
+  /* BACKEND: POST api/quiz_answer.php { question_id, answer, is_correct } */
+
+  // Style options
+  const LTRS = ['A','B','C','D'];
+  q.opts.forEach((_, i) => {
+    const lbl = document.getElementById('opt' + i);
+    if (lbl) {
+      lbl.querySelector('input').disabled = true;
+      if (LTRS[i] === q.ans) lbl.classList.add('correct');
+      else if (LTRS[i] === chosen && !correct) lbl.classList.add('wrong');
+    }
+  });
+
+  // Feedback panel
+  const fp = document.getElementById('fbPanel');
+  const correctText = q.opts.find(o => o.startsWith(q.ans+')'))?.substring(3) || q.ans;
+  const chosenText  = q.opts.find(o => o.startsWith(chosen+')'))?.substring(3) || chosen;
+  const ruleText = correct
+    ? (S.streak >= 3 ? '⚡ R2: Progressive Challenge — difficulty increasing' : '✅ R3: Reinforcement logged')
+    : '📚 R1: Remedial Focus — easier questions incoming';
+
+  fp.innerHTML = `
+    <div class="fb-panel">
+      <div class="fb-inner">
+        <div class="fb-left ${correct ? 'fb-correct' : 'fb-wrong'}">
+          <div class="fb-icon">${correct ? '✅' : '❌'}</div>
+          <div class="fb-verdict ${correct ? 'fv-correct' : 'fv-wrong'}">${correct ? 'CORRECT!' : 'WRONG!'}</div>
+          <div class="fb-pts">${correct ? '+10 pts' + (S.streak>1 ? ' 🔥×'+S.streak : '') : 'Keep going!'}</div>
+        </div>
+        <div class="fb-right">
+          <div class="fb-your-ans">Your Answer: ${chosen}</div>
+          ${!correct ? `<div class="fb-ans-row fb-ans-wrong">✗ ${chosen}) ${chosenText}</div>` : ''}
+          <div class="fb-ans-row fb-ans-correct">✓ ${q.ans}) ${correctText}</div>
+          <div class="fb-rule">${ruleText}</div>
+          <div class="fb-expl"><strong>Explanation:</strong> ${q.exp}</div>
+          ${S.idx < S.questions.length - 1
+            ? `<button class="btn btn-primary btn-full" onclick="nextQ()">Next Question →</button>`
+            : `<button class="btn btn-fun btn-full" onclick="finishSession()">🏁 Finish Session</button>`}
+        </div>
+      </div>
+    </div>`;
+
+  fp.style.display = 'block';
+  fp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  document.getElementById('submitBtn').disabled = true;
+}
+
+function nextQ() {
+  S.idx++;
+  renderQ();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function finishSession() {
+  clearInterval(S.timer);
+  const total = S.answers.length;
+  const correct = S.answers.filter(a => a.correct).length;
+  const score = total > 0 ? Math.round((correct/total)*100) : 0;
+  const mins = String(Math.floor(S.elapsed/60)).padStart(2,'0');
+  const secs = String(S.elapsed%60).padStart(2,'0');
+
+  /* BACKEND: POST api/quiz_complete.php { score, correct, total, time_elapsed } */
+
+  document.getElementById('rsEmoji').textContent = score>=80?'🏆':score>=60?'🎉':'💪';
+  document.getElementById('rsTitle').textContent = score>=80?'Outstanding!':score>=60?'Well Done!':'Keep Practising!';
+  document.getElementById('rsSub').textContent = `You scored ${score}% — ${correct} of ${total} correct`;
+
+  document.getElementById('rsGrid').innerHTML = `
+    <div class="rs-stat"><span class="rs-stat-n" style="color:var(--primary)">${score}%</span><span class="rs-stat-l">Score</span></div>
+    <div class="rs-stat"><span class="rs-stat-n" style="color:var(--accent-green)">${correct}</span><span class="rs-stat-l">Correct</span></div>
+    <div class="rs-stat"><span class="rs-stat-n" style="color:var(--danger)">${total-correct}</span><span class="rs-stat-l">Wrong</span></div>
+    <div class="rs-stat"><span class="rs-stat-n" style="color:var(--accent-yellow)">${mins}:${secs}</span><span class="rs-stat-l">Time</span></div>`;
+
+  const msg = score < 60
+    ? '<strong>🤖 Adaptive Decision:</strong> R1 (Remedial) — Your next session will focus on weaker topics with easier questions to build your foundation.'
+    : score < 80
+      ? '<strong>🤖 Adaptive Decision:</strong> R2 (Progressive) — Doing well! Difficulty increases slightly next session to keep you challenged.'
+      : '<strong>🤖 Adaptive Decision:</strong> R3 (Reinforcement) — Excellent mastery! Topics will be spaced out and revisited less frequently.';
+  document.getElementById('rsAdaptive').innerHTML = msg;
+
+  const bd = document.getElementById('rsBreakdown');
+  bd.innerHTML = `<div class="rs-bd-title">Question Breakdown</div>` +
+    S.answers.map((a,i) => `<div class="rs-bd-item">
+      <div class="rs-dot" style="background:${a.correct?'var(--accent-green)':'var(--danger)'}"></div>
+      <span style="color:var(--text-3);min-width:22px;font-size:11px">Q${i+1}</span>
+      <span class="rs-q-text">${a.q.text.substring(0,60)}…</span>
+      <strong style="color:${a.correct?'var(--accent-green)':'var(--danger)'};white-space:nowrap">${a.correct?'✓':'✗'} ${a.chosen}</strong>
+    </div>`).join('');
+
+  showScreen('screenResults');
+}
+
+function resetToSetup() {
+  clearInterval(S.timer);
+  document.getElementById('qtbCount').textContent = 'Setup';
+  document.getElementById('qtbFill').style.width = '0%';
+  document.getElementById('qtbTimer').textContent = '⏱ 00:00';
+  document.getElementById('qtbSubject').textContent = '—';
+  document.getElementById('qtbTopic').textContent = '—';
+  showScreen('screenSetup');
+}
+</script>
+</body>
+</html>

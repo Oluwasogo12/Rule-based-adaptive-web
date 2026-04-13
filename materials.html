@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Study Materials | DMA</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    /* ── PAGE LAYOUT ── */
+    .mat-page { display: flex; min-height: 100vh; }
+
+    /* ── SUBJECT TABS ── */
+    .mat-subject-tabs {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+    }
+    .subj-tab {
+      display: flex; align-items: center; gap: 7px; padding: 9px 18px;
+      border-radius: 50px; font-size: 13px; font-weight: 800; cursor: pointer;
+      border: 2px solid var(--border); background: var(--surface);
+      color: var(--text-2); transition: all var(--transition); white-space: nowrap;
+    }
+    .subj-tab:hover { border-color: var(--border-2); transform: translateY(-2px); }
+    .subj-tab.active { color: #fff; border-color: transparent; box-shadow: var(--shadow); }
+    .subj-tab-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── TOPIC SIDEBAR + READER LAYOUT ── */
+    .mat-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* ── TOPIC LIST ── */
+    .topic-list-card {
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: var(--radius-xl); overflow: hidden; position: sticky; top: 20px;
+    }
+    .tlc-head {
+      padding: 16px 18px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .tlc-head h3 { font-family: var(--font-display); font-size: 15px; }
+    .tlc-count {
+      font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 50px;
+      background: var(--bg-3); color: var(--text-3);
+    }
+    .topic-item {
+      display: flex; align-items: center; gap: 10px; padding: 12px 18px;
+      cursor: pointer; transition: all var(--transition); border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .topic-item:last-child { border-bottom: none; }
+    .topic-item:hover { background: var(--surface-2); }
+    .topic-item.active { background: rgba(58,123,213,.07); }
+    .topic-item.active::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: var(--primary); border-radius: 0 3px 3px 0;
+    }
+    .ti-icon { font-size: 18px; flex-shrink: 0; }
+    .ti-info { flex: 1; min-width: 0; }
+    .ti-name { font-size: 13px; font-weight: 700; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ti-sub { font-size: 10px; color: var(--text-3); font-weight: 700; margin-top: 1px; }
+    .ti-mastery {
+      font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 50px;
+      flex-shrink: 0;
+    }
+    .tm-high { background: rgba(46,213,115,.15); color: #2ed573; }
+    .tm-mid { background: rgba(255,165,2,.15); color: #ffa502; }
+    .tm-low { background: rgba(224,92,107,.15); color: #e05c6b; }
+    .tm-none { background: var(--bg-3); color: var(--text-3); }
+
+    /* ── READER PANEL ── */
+    .reader-panel {
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: var(--radius-xl); overflow: hidden;
+    }
+
+    /* ── READER HEADER ── */
+    .reader-header {
+      padding: 20px 24px; border-bottom: 2px solid var(--border);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+    }
+    .rh-left { flex: 1; }
+    .rh-breadcrumb {
+      display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+      font-size: 11px; font-weight: 800; color: var(--text-3); text-transform: uppercase; letter-spacing: .5px;
+    }
+    .rh-breadcrumb span { color: var(--primary); }
+    .rh-title { font-family: var(--font-display); font-size: 22px; margin-bottom: 6px; }
+    .rh-meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .rh-pill {
+      font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 50px;
+      border: 1.5px solid;
+    }
+    .rh-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .rh-btn {
+      display: flex; align-items: center; gap: 6px; padding: 8px 14px;
+      border-radius: 50px; font-size: 12px; font-weight: 800; cursor: pointer;
+      border: 2px solid var(--border); background: var(--surface);
+      color: var(--text-2); transition: all var(--transition);
+    }
+    .rh-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
+    .rh-btn.primary { background: var(--grad-primary); color: #fff; border-color: transparent; }
+    .rh-btn.primary:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+
+    /* ── READER BODY ── */
+    .reader-body { padding: 28px 32px; }
+
+    /* ── READING PROGRESS ── */
+    .read-progress-bar {
+      height: 4px; background: var(--bg-3); border-radius: 2px;
+      margin-bottom: 28px; overflow: hidden;
+    }
+    .rpb-fill {
+      height: 100%; background: var(--grad-primary); border-radius: 2px;
+      transition: width .6s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ── CONTENT BLOCKS ── */
+    .content-block { margin-bottom: 28px; animation: fadeInUp .35s ease; }
+    .cb-section-title {
+      font-family: var(--font-display); font-size: 17px; color: var(--primary);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .cb-section-title::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .cb-text {
+      font-size: 14px; line-height: 1.85; color: var(--text-2); font-weight: 600;
+    }
+    .cb-text strong { color: var(--text-1); }
+
+    /* ── KEY CONCEPT CALLOUT ── */
+    .key-concept {
+      background: linear-gradient(135deg, rgba(58,123,213,.06), rgba(90,150,232,.04));
+      border: 1.5px solid rgba(58,123,213,.2); border-left: 4px solid var(--primary);
+      border-radius: var(--radius-sm); padding: 16px 18px; margin: 16px 0;
+    }
+    .kc-label {
+      font-size: 10px; font-weight: 900; color: var(--primary); text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 6px;
+    }
+    .kc-text { font-size: 13px; font-weight: 700; color: var(--text-1); line-height: 1.7; }
+
+    /* ── FORMULA BOX ── */
+    .formula-box {
+      background: var(--bg-3); border: 2px solid var(--border-2);
+      border-radius: var(--radius-sm); padding: 16px 20px; margin: 14px 0;
+      font-family: 'Courier New', monospace; text-align: center;
+    }
+    .fb-label { font-size: 10px; font-weight: 800; color: var(--text-3); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; font-family: var(--font); }
+    .fb-formula { font-size: 16px; font-weight: 700; color: var(--primary); }
+
+    /* ── EXAMPLE BOX ── */
+    .example-box {
+      background: rgba(46,213,115,.05); border: 1.5px solid rgba(46,213,115,.2);
+      border-radius: var(--radius-sm); padding: 16px 18px; margin: 14px 0;
+    }
+    .ex-label { font-size: 10px; font-weight: 900; color: #2ed573; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .ex-text { font-size: 13px; font-weight: 600; color: var(--text-2); line-height: 1.7; }
+    .ex-text strong { color: var(--text-1); }
+
+    /* ── NOTE BOX ── */
+    .note-box {
+      background: rgba(255,165,2,.05); border: 1.5px solid rgba(255,165,2,.25);
+      border-radius: var(--radius-sm); padding: 14px 18px; margin: 14px 0;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .nb-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .nb-text { font-size: 13px; font-weight: 600; color: var(--text-2); line-height: 1.7; }
+
+    /* ── KEY POINTS LIST ── */
+    .key-points { margin: 12px 0; }
+    .kp-item {
+      display: flex; gap: 10px; align-items: flex-start;
+      padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+      font-weight: 600; color: var(--text-2); line-height: 1.6;
+    }
+    .kp-item:last-child { border-bottom: none; }
+    .kp-num {
+      width: 22px; height: 22px; border-radius: 50%; background: var(--grad-primary);
+      color: #fff; font-size: 11px; font-weight: 900; display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* ── SUMMARY CARD ── */
+    .summary-card {
+      background: var(--grad-primary); border-radius: var(--radius-lg);
+      padding: 22px 24px; margin-top: 28px; color: #fff;
+    }
+    .sc-title { font-family: var(--font-display); font-size: 16px; margin-bottom: 10px; opacity: .9; }
+    .sc-points { display: flex; flex-direction: column; gap: 6px; }
+    .sc-point { font-size: 13px; font-weight: 700; opacity: .88; display: flex; gap: 8px; }
+    .sc-point::before { content: '✓'; opacity: 1; }
+
+    /* ── READER FOOTER ── */
+    .reader-footer {
+      padding: 18px 24px; border-top: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .rf-nav { display: flex; gap: 8px; }
+
+    /* ── EMPTY STATE ── */
+    .empty-reader {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 80px 24px; text-align: center; gap: 16px;
+    }
+    .er-icon { font-size: 56px; opacity: .5; }
+    .er-title { font-family: var(--font-display); font-size: 20px; color: var(--text-2); }
+    .er-sub { font-size: 13px; color: var(--text-3); font-weight: 600; max-width: 300px; }
+
+    /* ── SEARCH ── */
+    .mat-search-wrap { position: relative; margin-bottom: 16px; }
+    .mat-search {
+      width: 100%; padding: 10px 16px 10px 40px; border-radius: 50px;
+      border: 2px solid var(--border); background: var(--surface);
+      font-size: 13px; font-weight: 700; color: var(--text-1);
+      transition: border-color var(--transition); outline: none; font-family: var(--font);
+    }
+    .mat-search:focus { border-color: var(--primary); }
+    .mat-search::placeholder { color: var(--text-3); }
+    .mat-search-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 15px; pointer-events: none;
+    }
+
+    /* ── PROGRESS OVERVIEW ── */
+    .mat-progress-strip {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+      margin-bottom: 20px;
+    }
+    .mps-card {
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: var(--radius-lg); padding: 12px 14px; text-align: center;
+      cursor: pointer; transition: all var(--transition);
+    }
+    .mps-card:hover { transform: translateY(-3px); border-color: var(--border-2); box-shadow: var(--shadow); }
+    .mps-emoji { font-size: 20px; margin-bottom: 4px; }
+    .mps-label { font-size: 10px; font-weight: 800; color: var(--text-3); text-transform: uppercase; letter-spacing: .5px; }
+    .mps-pct { font-family: var(--font-display); font-size: 18px; margin: 2px 0; }
+    .mps-bar { height: 4px; background: var(--bg-3); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+    .mps-fill { height: 100%; border-radius: 2px; transition: width .8s; }
+
+    /* ── QUIZ CTA BANNER ── */
+    .quiz-cta-banner {
+      background: linear-gradient(135deg, rgba(58,123,213,.08), rgba(90,150,232,.05));
+      border: 2px solid rgba(58,123,213,.18); border-radius: var(--radius-lg);
+      padding: 16px 20px; display: flex; align-items: center;
+      justify-content: space-between; gap: 12px; margin-top: 20px;
+    }
+    .qcb-text h4 { font-family: var(--font-display); font-size: 15px; margin-bottom: 3px; }
+    .qcb-text p { font-size: 12px; color: var(--text-2); font-weight: 600; }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:1000px) {
+      .mat-layout { grid-template-columns: 220px 1fr; }
+      .mat-progress-strip { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media(max-width:768px) {
+      .mat-layout { grid-template-columns: 1fr; }
+      .topic-list-card { position: static; }
+      .reader-body { padding: 20px 18px; }
+      .reader-header { flex-direction: column; }
+      .rh-actions { width: 100%; }
+      .mat-progress-strip { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media(max-width:500px) {
+      .mat-progress-strip { grid-template-columns: repeat(2, 1fr); }
+      .rh-title { font-size: 18px; }
+    }
+  </style>
+</head>
+<body class="dashboard-body">
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text"><span class="logo-main">DMA</span><span class="logo-sub">Mastery</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html" class="sn-item"><span class="sn-icon">🏠</span><span>Dashboard</span></a>
+    <a href="materials.html" class="sn-item active"><span class="sn-icon">📚</span><span>Study Materials</span></a>
+    <a href="quiz.html" class="sn-item"><span class="sn-icon">🧠</span><span>Practice Session</span></a>
+    <a href="reports.html" class="sn-item"><span class="sn-icon">📊</span><span>Reports</span></a>
+    <a href="games.html" class="sn-item"><span class="sn-icon">🎮</span><span>Game Zone</span><span class="sn-new">NEW</span></a>
+    <a href="profile.html" class="sn-item"><span class="sn-icon">👤</span><span>Profile</span></a>
+    <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border)"></div>
+    <a href="login.html" class="sn-item sn-logout"><span class="sn-icon">🚪</span><span>Logout</span></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="sidebar-user">
+      <div class="su-avatar">D</div>
+      <div class="su-info"><span class="su-name">David A.</span><span class="su-type">UTME Student</span></div>
+    </div>
+  </div>
+</aside>
+
+<main class="dashboard-main">
+  <header class="dash-header">
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="dash-header-content">
+      <h1 class="dash-welcome">📚 Study Materials</h1>
+      <p class="dash-date" id="dashDate"></p>
+    </div>
+    <div class="dash-header-actions">
+      <button class="theme-toggle" id="themeToggle">
+        <span class="toggle-option active" id="darkOpt">🌙</span>
+        <span class="toggle-option" id="lightOpt">☀️</span>
+      </button>
+      <div class="streak-badge">🔥 <span id="streakNum">7</span> Day Streak</div>
+      <a href="quiz.html" class="btn btn-primary btn-sm">▶ Practice</a>
+    </div>
+  </header>
+
+  <div class="dash-content">
+
+    <!-- PROGRESS OVERVIEW STRIP -->
+    <div class="mat-progress-strip" id="progressStrip"></div>
+
+    <!-- SUBJECT TABS -->
+    <div class="mat-subject-tabs" id="subjectTabs"></div>
+
+    <!-- MAIN LAYOUT: Topic List + Reader -->
+    <div class="mat-layout">
+
+      <!-- TOPIC LIST -->
+      <div>
+        <div class="mat-search-wrap">
+          <span class="mat-search-icon">🔍</span>
+          <input type="text" class="mat-search" id="topicSearch" placeholder="Search topics…"/>
+        </div>
+        <div class="topic-list-card">
+          <div class="tlc-head">
+            <h3 id="topicListTitle">Topics</h3>
+            <span class="tlc-count" id="topicCount">0</span>
+          </div>
+          <div id="topicList"></div>
+        </div>
+      </div>
+
+      <!-- READER PANEL -->
+      <div class="reader-panel" id="readerPanel">
+        <div class="empty-reader" id="emptyReader">
+          <div class="er-icon">📖</div>
+          <div class="er-title">Select a Topic to Study</div>
+          <div class="er-sub">Choose any topic from the list to start reading the study material.</div>
+        </div>
+        <div id="readerContent" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- QUIZ CTA -->
+    <div class="quiz-cta-banner">
+      <div class="qcb-text">
+        <h4>🚀 Ready to test your knowledge?</h4>
+        <p>After studying a topic, take an adaptive quiz to reinforce what you've learned.</p>
+      </div>
+      <a href="quiz.html" class="btn btn-fun btn-sm">Start Quiz 🎯</a>
+    </div>
+
+  </div>
+</main>
+
+<script src="app.js"></script>
+<script>
+/* ─── DATA ─────────────────────────────────────────────
+   Structure mirrors what will come from your MySQL DB:
+   subjects → topics (schemes) → material content
+   Replace SUBJECTS/MATERIALS with API calls when backend is ready.
+   API: GET /api/materials?subject={id}&topic={id}
+──────────────────────────────────────────────────────── */
+
+const SUBJECTS = [
+  { id:'maths',   label:'Mathematics',     emoji:'📐', color:'#6c63ff', mastery:75 },
+  { id:'english', label:'English Language', emoji:'📝', color:'#6bcb77', mastery:60 },
+  { id:'biology', label:'Biology',          emoji:'🧬', color:'#48dbfb', mastery:45 },
+  { id:'chemistry',label:'Chemistry',       emoji:'⚗️',  color:'#ff6584', mastery:80 },
+  { id:'physics', label:'Physics',          emoji:'⚡', color:'#ffd93d', mastery:55 },
+];
+
+/* Each topic maps to a scheme in your DB (scheme_id).
+   mastery % will come from the student's performance record.
+   content is the frontend representation of your material_notes. */
+const TOPICS = {
+  maths: [
+    { id:'alg',  scheme_id:'MTH001', name:'Algebra',            icon:'🔢', mastery:82,
+      content: buildMathsAlgebra() },
+    { id:'calc', scheme_id:'MTH002', name:'Calculus',           icon:'📈', mastery:68,
+      content: buildMathsCalculus() },
+    { id:'trig', scheme_id:'MTH003', name:'Trigonometry',       icon:'📐', mastery:55,
+      content: buildMathsTrig() },
+    { id:'stat', scheme_id:'MTH004', name:'Statistics & Probability', icon:'📊', mastery:70,
+      content: buildMathsStats() },
+    { id:'geo',  scheme_id:'MTH005', name:'Coordinate Geometry', icon:'🗺️',  mastery:40,
+      content: buildMathsGeo() },
+  ],
+  english: [
+    { id:'comp',  scheme_id:'ENG001', name:'Comprehension',      icon:'📖', mastery:65,
+      content: buildEnglishComp() },
+    { id:'essay', scheme_id:'ENG002', name:'Essay Writing',      icon:'✍️', mastery:58,
+      content: buildEnglishEssay() },
+    { id:'gram',  scheme_id:'ENG003', name:'Grammar & Structure', icon:'📝', mastery:72,
+      content: buildEnglishGrammar() },
+    { id:'vocab', scheme_id:'ENG004', name:'Vocabulary & Lexis', icon:'💬', mastery:55,
+      content: buildEnglishVocab() },
+  ],
+  biology: [
+    { id:'cell',  scheme_id:'BIO001', name:'Cell Biology',       icon:'🔬', mastery:50,
+      content: buildBiologyCell() },
+    { id:'gen',   scheme_id:'BIO002', name:'Genetics & Heredity', icon:'🧬', mastery:38,
+      content: buildBiologyGenetics() },
+    { id:'eco',   scheme_id:'BIO003', name:'Ecology & Environment',icon:'🌿',mastery:45,
+      content: buildBiologyEcology() },
+    { id:'phy',   scheme_id:'BIO004', name:'Plant Physiology',   icon:'🌱', mastery:30,
+      content: buildBiologyPlant() },
+  ],
+  chemistry: [
+    { id:'org',   scheme_id:'CHM001', name:'Organic Chemistry',  icon:'⚗️', mastery:85,
+      content: buildChemOrganic() },
+    { id:'bond',  scheme_id:'CHM002', name:'Chemical Bonding',   icon:'🔗', mastery:78,
+      content: buildChemBonding() },
+    { id:'redox', scheme_id:'CHM003', name:'Redox Reactions',    icon:'⚡', mastery:80,
+      content: buildChemRedox() },
+    { id:'equil', scheme_id:'CHM004', name:'Chemical Equilibrium',icon:'⚖️',mastery:72,
+      content: buildChemEquil() },
+  ],
+  physics: [
+    { id:'mech',  scheme_id:'PHY001', name:'Mechanics',          icon:'🏋️', mastery:62,
+      content: buildPhysicsMech() },
+    { id:'wave',  scheme_id:'PHY002', name:'Waves & Sound',      icon:'🌊', mastery:48,
+      content: buildPhysicsWaves() },
+    { id:'elec',  scheme_id:'PHY003', name:'Electricity & Magnetism',icon:'💡',mastery:55,
+      content: buildPhysicsElec() },
+    { id:'heat',  scheme_id:'PHY004', name:'Heat & Thermodynamics',icon:'🌡️', mastery:40,
+      content: buildPhysicsHeat() },
+  ],
+};
+
+/* ─── CONTENT BUILDERS ──────────────────────────────────
+   These produce the HTML shown in the reader panel.
+   When your PHP/MySQL backend is ready, swap these for
+   API responses formatted the same way.
+──────────────────────────────────────────────────────── */
+
+function section(title, body) {
+  return `<div class="content-block">
+    <div class="cb-section-title">${title}</div>
+    ${body}
+  </div>`;
+}
+function text(t) { return `<p class="cb-text">${t}</p>`; }
+function concept(label, t) {
+  return `<div class="key-concept"><div class="kc-label">📌 Key Concept — ${label}</div><div class="kc-text">${t}</div></div>`;
+}
+function formula(label, f) {
+  return `<div class="formula-box"><div class="fb-label">${label}</div><div class="fb-formula">${f}</div></div>`;
+}
+function example(t) {
+  return `<div class="example-box"><div class="ex-label">✏️ Worked Example</div><div class="ex-text">${t}</div></div>`;
+}
+function note(t) {
+  return `<div class="note-box"><div class="nb-icon">💡</div><div class="nb-text">${t}</div></div>`;
+}
+function points(items) {
+  return `<div class="key-points">${items.map((it,i)=>`<div class="kp-item"><div class="kp-num">${i+1}</div><div>${it}</div></div>`).join('')}</div>`;
+}
+function summary(pts) {
+  return `<div class="summary-card"><div class="sc-title">📋 Quick Summary</div><div class="sc-points">${pts.map(p=>`<div class="sc-point">${p}</div>`).join('')}</div></div>`;
+}
+
+function buildMathsAlgebra() {
+  return section('What is Algebra?',
+    text('Algebra is the branch of mathematics dealing with <strong>symbols and the rules for manipulating those symbols</strong>. It generalises arithmetic by using letters to represent numbers.') +
+    concept('Variable', 'A variable (e.g. x, y, n) is a symbol that represents an unknown or changeable quantity.') +
+    section('Types of Algebraic Expressions',
+      text('An expression is a combination of numbers, variables and operations. Key types include:') +
+      points(['<strong>Monomial</strong> — one term: 3x², 7y', '<strong>Binomial</strong> — two terms: 2x + 5', '<strong>Trinomial</strong> — three terms: x² + 3x − 4', '<strong>Polynomial</strong> — many terms']) +
+      note('UTME/SSCE commonly tests simplification and factorisation of polynomials.')
+    ) +
+    section('Factorisation',
+      text('Factorisation is the process of expressing an expression as a product of its factors.') +
+      formula('Difference of Two Squares', 'a² − b² = (a + b)(a − b)') +
+      formula('Perfect Square Trinomial', 'a² + 2ab + b² = (a + b)²') +
+      example('<strong>Question:</strong> Factorise x² − 9.<br><br><strong>Solution:</strong> x² − 9 = x² − 3² = (x + 3)(x − 3)') +
+      example('<strong>Question:</strong> Factorise 2x² + 5x + 3.<br><br><strong>Solution:</strong> Find two numbers that multiply to 2×3=6 and add to 5: those are 2 and 3.<br>2x² + 2x + 3x + 3 = 2x(x+1) + 3(x+1) = <strong>(2x+3)(x+1)</strong>')
+    ) +
+    section('Quadratic Equations',
+      formula('Quadratic Formula', 'x = (−b ± √(b²−4ac)) / 2a') +
+      text('The <strong>discriminant</strong> Δ = b²−4ac tells us the nature of roots:') +
+      points(['Δ > 0 → Two distinct real roots', 'Δ = 0 → One repeated real root', 'Δ < 0 → No real roots (complex)']) +
+      note('Always check that your answer satisfies the original equation, especially in word problems.')
+    ) +
+    summary(['Algebra uses variables to generalise arithmetic rules', 'Factorise polynomials using common factors, grouping, or formulas', 'Solve quadratic equations by factorisation or the quadratic formula', 'The discriminant determines the nature of quadratic roots'])
+  );
+}
+
+function buildMathsCalculus() {
+  return section('Introduction to Calculus',
+    text('Calculus is divided into <strong>Differentiation</strong> (rates of change) and <strong>Integration</strong> (area under curves). Both topics appear regularly in UTME Mathematics.') +
+    concept('Limit', 'The limit of a function f(x) as x → a is the value f(x) approaches as x gets closer to a, without necessarily reaching a.')
+  ) +
+  section('Differentiation',
+    text('Differentiation measures how a function changes. The derivative f\'(x) gives the <strong>slope of the tangent</strong> at any point.') +
+    formula('Power Rule', 'd/dx (xⁿ) = nxⁿ⁻¹') +
+    formula('Product Rule', 'd/dx (uv) = u\'v + uv\'') +
+    formula('Chain Rule', 'd/dx f(g(x)) = f\'(g(x)) · g\'(x)') +
+    example('<strong>Question:</strong> Differentiate y = 3x⁴ − 5x² + 7.<br><br><strong>Solution:</strong> dy/dx = 12x³ − 10x')
+  ) +
+  section('Integration',
+    text('Integration is the <strong>reverse of differentiation</strong>. It calculates the area under a curve.') +
+    formula('Power Rule (Integration)', '∫ xⁿ dx = xⁿ⁺¹/(n+1) + C  (n ≠ −1)') +
+    example('<strong>Question:</strong> Evaluate ∫(4x³ + 2x) dx.<br><br><strong>Solution:</strong> = x⁴ + x² + C') +
+    note('Always add the constant of integration C for indefinite integrals.')
+  ) +
+  summary(['Differentiation finds the rate of change (slope) of a function', 'Integration is the reverse of differentiation and finds area', 'Master the power, product, and chain rules for differentiation', 'Always include +C in indefinite integration answers']);
+}
+
+function buildMathsTrig() {
+  return section('Trigonometric Ratios',
+    concept('SOH-CAH-TOA', 'Sin θ = Opposite/Hypotenuse &nbsp;|&nbsp; Cos θ = Adjacent/Hypotenuse &nbsp;|&nbsp; Tan θ = Opposite/Adjacent') +
+    text('These ratios are defined for a <strong>right-angled triangle</strong> and apply to angles between 0° and 90°.') +
+    formula('Pythagorean Identity', 'sin²θ + cos²θ = 1') +
+    formula('Sine Rule', 'a/sin A = b/sin B = c/sin C') +
+    formula('Cosine Rule', 'a² = b² + c² − 2bc·cos A')
+  ) +
+  section('Special Angles',
+    text('You must memorise the exact values for 0°, 30°, 45°, 60° and 90°:') +
+    points(['sin 30° = ½,  cos 30° = √3/2,  tan 30° = 1/√3', 'sin 45° = 1/√2,  cos 45° = 1/√2,  tan 45° = 1', 'sin 60° = √3/2,  cos 60° = ½,  tan 60° = √3', 'sin 0° = 0,  sin 90° = 1,  cos 0° = 1,  cos 90° = 0']) +
+    note('UTME questions frequently ask for exact values — avoid rounding where exact form is possible.')
+  ) +
+  summary(['SOH-CAH-TOA defines the basic trig ratios in a right triangle', 'sin²θ + cos²θ = 1 is the most important trig identity', 'Use the sine rule for non-right triangles with angle-side pairs', 'Memorise exact values for 30°, 45° and 60°']);
+}
+
+function buildMathsStats() {
+  return section('Measures of Central Tendency',
+    text('These values describe the <strong>centre</strong> of a data set.') +
+    points(['<strong>Mean:</strong> sum of all values ÷ number of values', '<strong>Median:</strong> middle value when data is arranged in order', '<strong>Mode:</strong> value that appears most frequently']) +
+    example('<strong>Data:</strong> 4, 7, 7, 9, 12, 14<br><strong>Mean</strong> = (4+7+7+9+12+14)/6 = 53/6 ≈ 8.83<br><strong>Median</strong> = (7+9)/2 = 8 (average of 3rd and 4th values)<br><strong>Mode</strong> = 7')
+  ) +
+  section('Probability',
+    concept('Basic Probability', 'P(Event) = Number of favourable outcomes ÷ Total number of outcomes') +
+    text('Probability always lies between 0 (impossible) and 1 (certain).') +
+    formula('Addition Rule', 'P(A ∪ B) = P(A) + P(B) − P(A ∩ B)') +
+    formula('Multiplication Rule (Independent)', 'P(A ∩ B) = P(A) × P(B)') +
+    note('For mutually exclusive events, P(A ∩ B) = 0, so P(A ∪ B) = P(A) + P(B).')
+  ) +
+  summary(['Mean, median and mode describe the centre of a distribution', 'Probability = favourable outcomes ÷ total outcomes', 'The addition rule accounts for events that can overlap', 'Independent events have probabilities that multiply directly']);
+}
+
+function buildMathsGeo() {
+  return section('The Cartesian Plane',
+    text('Coordinate geometry studies shapes using <strong>algebraic equations</strong> on the x-y plane. Each point is described by an ordered pair (x, y).') +
+    formula('Distance Between Two Points', 'd = √[(x₂−x₁)² + (y₂−y₁)²]') +
+    formula('Midpoint Formula', 'M = ((x₁+x₂)/2, (y₁+y₂)/2)')
+  ) +
+  section('Equation of a Line',
+    formula('Slope-Intercept Form', 'y = mx + c  (m = slope, c = y-intercept)') +
+    formula('Slope Formula', 'm = (y₂−y₁) / (x₂−x₁)') +
+    text('Two lines are <strong>parallel</strong> if they have equal slopes. They are <strong>perpendicular</strong> if the product of their slopes is −1.') +
+    example('<strong>Find the equation of the line through (1, 3) and (4, 9).</strong><br>m = (9−3)/(4−1) = 6/3 = 2<br>y − 3 = 2(x − 1) → y = 2x + 1')
+  ) +
+  summary(['Distance and midpoint formulas connect geometry with algebra', 'y = mx + c is the standard form of a straight line equation', 'Parallel lines share the same slope', 'Perpendicular lines have slopes whose product is −1']);
+}
+
+function buildEnglishComp() {
+  return section('What is Comprehension?',
+    text('Comprehension tests your ability to <strong>understand, interpret, and draw meaning</strong> from a passage of text. UTME English comprehension passages may be prose, poetry, or argumentative text.') +
+    concept('Inference', 'An inference is a conclusion drawn from evidence within the text — the answer is not stated directly, but implied.')
+  ) +
+  section('Reading Strategies',
+    points(['<strong>Skim first</strong> — read quickly for the general idea before answering questions', '<strong>Locate keywords</strong> — match keywords in the question to phrases in the passage', '<strong>Read the context</strong> — never answer from a single sentence; check surrounding sentences', '<strong>Eliminate distractors</strong> — cross out obviously wrong options to narrow choices', '<strong>Check vocabulary in context</strong> — word meaning questions require understanding tone and usage'])
+  ) +
+  section('Common Question Types',
+    text('Know what each question type is asking:') +
+    points(['<strong>Main idea</strong> — what is the central argument or theme?', '<strong>Inference</strong> — what can you conclude from the passage?', '<strong>Vocabulary in context</strong> — what does this word mean as used here?', '<strong>Author\'s purpose</strong> — why did the author write this?', '<strong>Tone/attitude</strong> — is the author critical, supportive, neutral?']) +
+    note('UTME passages are typically 250–400 words. Practice reading academic and formal texts to build speed.')
+  ) +
+  summary(['Skim the passage for main idea before reading questions', 'Inference questions require reading between the lines', 'Vocabulary questions depend on context, not dictionary definitions', 'Eliminate wrong options to improve accuracy on difficult questions']);
+}
+
+function buildEnglishEssay() {
+  return section('Types of Essays in SSCE/UTME',
+    points(['<strong>Argumentative / Discursive</strong> — presents two sides of an issue', '<strong>Expository</strong> — explains or informs about a topic clearly', '<strong>Narrative</strong> — tells a story with a beginning, middle and end', '<strong>Descriptive</strong> — paints a vivid picture of a person, place or thing', '<strong>Formal Letter / Report</strong> — structured with set conventions'])
+  ) +
+  section('Essay Structure',
+    concept('The 5-Paragraph Model', '<strong>Introduction</strong> (thesis statement) → <strong>Body paragraph 1</strong> → <strong>Body paragraph 2</strong> → <strong>Body paragraph 3</strong> → <strong>Conclusion</strong> (restate thesis, call to action).') +
+    text('Each body paragraph should follow the <strong>P-E-E</strong> structure: <strong>Point</strong> → <strong>Evidence</strong> → <strong>Explanation</strong>.') +
+    note('WAEC awards marks for Content, Organisation, Expression, and Mechanical Accuracy. Organisation is often undervalued by students.')
+  ) +
+  section('Formal Letter Format',
+    points(["Writer's address (top right)", "Date (below address)", "Recipient's address (left, below date)", "Salutation: Dear Sir/Madam", "Subject line (underlined)", "Body paragraphs", "Complimentary close: Yours faithfully", "Signature and full name"])
+  ) +
+  summary(['Know the type of essay before you start writing', 'Every body paragraph needs a clear point with evidence', 'Formal letters require a strict layout — memorise the format', 'Good essays have varied vocabulary and correct punctuation']);
+}
+
+function buildEnglishGrammar() {
+  return section('Parts of Speech',
+    points(['<strong>Noun</strong> — names a person, place, thing or idea', '<strong>Pronoun</strong> — replaces a noun (he, she, they, it)', '<strong>Verb</strong> — expresses action or state of being', '<strong>Adjective</strong> — modifies a noun', '<strong>Adverb</strong> — modifies a verb, adjective or another adverb', '<strong>Conjunction</strong> — joins clauses (and, but, because)', '<strong>Preposition</strong> — shows relationship (in, on, at, by)', '<strong>Interjection</strong> — expresses emotion (Oh!, Wow!)'])
+  ) +
+  section('Common Grammar Errors to Avoid',
+    points(['<strong>Subject-verb agreement:</strong> The group of students <em>is</em> (not are) studying.', '<strong>Tense consistency:</strong> Do not switch tenses mid-sentence.', '<strong>Pronoun reference:</strong> Make sure the pronoun clearly refers to a specific noun.', '<strong>Misplaced modifiers:</strong> "Running fast, the bus was missed" → wrong; say "Running fast, she missed the bus."', '<strong>Double negatives:</strong> "I didn\'t do nothing" is incorrect; say "I didn\'t do anything."']) +
+    note('Examination setters in UTME/WAEC frequently test subject-verb agreement and correct use of articles (a, an, the).')
+  ) +
+  summary(['All eight parts of speech have distinct roles in a sentence', 'Subject and verb must always agree in number', 'Modifiers must be placed close to the word they modify', 'Avoid double negatives in formal writing']);
+}
+
+function buildEnglishVocab() {
+  return section('Word Formation',
+    text('Understanding how words are built helps you decode unfamiliar vocabulary in exams.') +
+    points(['<strong>Prefix</strong> — added before a root word: un-, re-, pre-, mis-', '<strong>Suffix</strong> — added after a root word: -tion, -ness, -ful, -less', '<strong>Root word</strong> — the base meaning of a word: "port" (carry) → transport, import, export'])
+  ) +
+  section('Synonyms, Antonyms & Homonyms',
+    concept('Synonym', 'A word with a similar meaning. E.g., happy → joyful, content, elated.') +
+    concept('Antonym', 'A word with the opposite meaning. E.g., happy → sad, miserable, unhappy.') +
+    concept('Homonym', 'Words that sound alike but differ in meaning. E.g., "bare" and "bear", "right" and "write".') +
+    note('UTME Lexis & Structure questions often test ability to identify the correct synonym in context, not just in isolation.')
+  ) +
+  summary(['Prefixes and suffixes change the meaning and class of words', 'Synonyms and antonyms appear heavily in lexis questions', 'Homonyms require careful context reading to use correctly', 'Build vocabulary daily by reading newspapers and novels']);
+}
+
+function buildBiologyCell() {
+  return section('The Cell — Basic Unit of Life',
+    text('All living things are made of <strong>cells</strong>. Cells carry out all the functions necessary for life: growth, reproduction, energy production, and response to stimuli.') +
+    concept('Cell Theory', '(1) All living organisms are composed of cells. (2) The cell is the basic unit of life. (3) All cells arise from pre-existing cells.')
+  ) +
+  section('Prokaryotic vs Eukaryotic Cells',
+    points(['<strong>Prokaryotic</strong> (bacteria): No membrane-bound nucleus; smaller; no membrane-bound organelles', '<strong>Eukaryotic</strong> (plants, animals, fungi): True nucleus enclosed by nuclear membrane; larger; complex organelles']) +
+    note('UTME Biology regularly asks you to distinguish between prokaryotic and eukaryotic cell features.')
+  ) +
+  section('Key Organelles and their Functions',
+    points(['<strong>Nucleus</strong> — controls cell activities; contains DNA', '<strong>Mitochondria</strong> — site of aerobic respiration (energy production)', '<strong>Ribosome</strong> — site of protein synthesis', '<strong>Endoplasmic Reticulum (ER)</strong> — transports materials within the cell', '<strong>Golgi Apparatus</strong> — packages and secretes proteins', '<strong>Chloroplast</strong> (plant only) — site of photosynthesis', '<strong>Cell wall</strong> (plant only) — provides structural support', '<strong>Vacuole</strong> (large in plants) — stores water and maintains turgor pressure'])
+  ) +
+  summary(['All cells are bounded by a plasma membrane and contain cytoplasm', 'Prokaryotes lack a true nucleus; eukaryotes have a membrane-bound nucleus', 'Mitochondria produce ATP through respiration', 'Chloroplasts are found only in plant cells and are the site of photosynthesis']);
+}
+
+function buildBiologyGenetics() {
+  return section('Basic Genetics',
+    concept('Gene', 'A segment of DNA that codes for a specific protein, determining a particular trait.') +
+    concept('Allele', 'Alternative forms of a gene found at the same locus on homologous chromosomes. Can be dominant (expressed when one copy is present) or recessive (expressed only when two copies are present).') +
+    formula('Monohybrid Cross (Punnett Square)', 'Aa × Aa → 1AA : 2Aa : 1aa (3:1 phenotype ratio)')
+  ) +
+  section('Key Terms',
+    points(['<strong>Genotype</strong> — genetic makeup (e.g., AA, Aa, aa)', '<strong>Phenotype</strong> — observable characteristics (e.g., tall, short)', '<strong>Homozygous</strong> — two identical alleles (AA or aa)', '<strong>Heterozygous</strong> — two different alleles (Aa)', '<strong>Dominant</strong> — allele that masks the recessive allele']) +
+    example('<strong>Question:</strong> A tall (Tt) plant is crossed with a short (tt) plant. What is the expected phenotypic ratio of the offspring?<br><br>Tt × tt → Tt, Tt, tt, tt<br>Ratio: <strong>2 Tall : 2 Short = 1:1</strong>')
+  ) +
+  summary(['Genes are the units of heredity located on chromosomes', 'Dominant alleles are expressed over recessive alleles', 'Punnett squares predict offspring genotype and phenotype ratios', 'Homozygous = same alleles; Heterozygous = different alleles']);
+}
+
+function buildBiologyEcology() {
+  return section('Ecosystem Structure',
+    concept('Ecosystem', 'A system formed by the interaction of a community of organisms (biotic factors) with their physical environment (abiotic factors).') +
+    text('Key abiotic factors include: <strong>temperature, light intensity, water, soil type, and pH</strong>. These influence which organisms can survive in a habitat.') +
+    points(['<strong>Producer</strong> — autotrophs that make food via photosynthesis (plants, algae)', '<strong>Primary consumer</strong> — herbivores that eat producers', '<strong>Secondary consumer</strong> — carnivores that eat herbivores', '<strong>Decomposer</strong> — break down dead matter (fungi, bacteria)'])
+  ) +
+  section('Food Chains and Food Webs',
+    formula('Simple Food Chain', 'Grass → Grasshopper → Frog → Snake → Eagle') +
+    note('Energy is lost at each trophic level (approximately 90% is lost as heat). Only ~10% is transferred to the next level — this is the 10% energy rule.')
+  ) +
+  summary(['Ecosystems include both biotic (living) and abiotic (non-living) components', 'Energy flows from producers → consumers → decomposers', 'Only about 10% of energy transfers between trophic levels', 'Food webs show the complex feeding relationships in an ecosystem']);
+}
+
+function buildBiologyPlant() {
+  return section('Photosynthesis',
+    formula('Photosynthesis Equation', '6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂') +
+    text('Photosynthesis occurs in the <strong>chloroplasts</strong> and is divided into:') +
+    points(['<strong>Light-dependent stage</strong> — occurs in thylakoid membranes; water is split, ATP and NADPH are produced', '<strong>Light-independent stage (Calvin Cycle)</strong> — occurs in stroma; CO₂ is fixed into glucose using ATP and NADPH'])
+  ) +
+  section('Factors Affecting Photosynthesis',
+    points(['<strong>Light intensity</strong> — increasing light increases the rate up to a saturation point', '<strong>CO₂ concentration</strong> — higher CO₂ increases rate up to a maximum', '<strong>Temperature</strong> — enzymes work optimally at ~25-30°C; above 40°C they denature']) +
+    note('At the compensation point, the rate of photosynthesis exactly equals the rate of respiration — there is no net gas exchange.')
+  ) +
+  summary(['Photosynthesis converts light energy into chemical energy (glucose)', 'It occurs in two stages: light-dependent and light-independent', 'Light, CO₂ and temperature are the three main limiting factors', 'Chlorophyll absorbs red and blue light most effectively']);
+}
+
+function buildChemOrganic() {
+  return section('Hydrocarbons',
+    text('Organic chemistry studies carbon-containing compounds. Hydrocarbons contain only <strong>carbon and hydrogen</strong>.') +
+    points(['<strong>Alkanes</strong> (CₙH₂ₙ₊₂) — single bonds, saturated: methane, ethane, propane', '<strong>Alkenes</strong> (CₙH₂ₙ) — one C=C double bond, unsaturated: ethene, propene', '<strong>Alkynes</strong> (CₙH₂ₙ₋₂) — one C≡C triple bond: ethyne']) +
+    concept('Homologous Series', 'A family of compounds with the same general formula, similar chemical properties, and properties that change gradually with increasing carbon chain length.')
+  ) +
+  section('Functional Groups',
+    points(['<strong>Alcohol (−OH)</strong> — ethanol (C₂H₅OH)', '<strong>Carboxylic acid (−COOH)</strong> — ethanoic acid (acetic acid)', '<strong>Ester (−COO−)</strong> — formed from acid + alcohol', '<strong>Amine (−NH₂)</strong> — aminobenzene (aniline)', '<strong>Aldehyde (−CHO)</strong> — methanal (formaldehyde)']) +
+    note('UTME/WAEC Chemistry tests IUPAC naming, identification of functional groups, and reaction types for each series.')
+  ) +
+  summary(['Alkanes are saturated; alkenes and alkynes are unsaturated', 'The functional group determines the chemical reactions of a compound', 'Homologous series share the same general formula and chemical properties', 'Esters are formed by the reaction of a carboxylic acid with an alcohol']);
+}
+
+function buildChemBonding() {
+  return section('Types of Chemical Bonds',
+    points(['<strong>Ionic bonding</strong> — transfer of electrons between a metal and non-metal; produces ions held by electrostatic attraction', '<strong>Covalent bonding</strong> — sharing of electron pairs between non-metals', '<strong>Metallic bonding</strong> — sea of delocalised electrons surrounding positive metal ions', '<strong>Dative (coordinate) bond</strong> — both electrons in the shared pair come from one atom'])
+  ) +
+  section('Ionic vs Covalent Compounds',
+    points(['Ionic: high melting/boiling points; conduct electricity when dissolved or molten; form crystalline solids', 'Covalent: low melting/boiling points (except giant covalent); poor electrical conductors; exist as discrete molecules']) +
+    formula('Electron Configuration — Na', '2,8,1 → loses 1 electron → Na⁺ (2,8)') +
+    formula('Electron Configuration — Cl', '2,8,7 → gains 1 electron → Cl⁻ (2,8,8)') +
+    note('Electronegativity difference guides bond type: >1.7 → ionic; 0.4–1.7 → polar covalent; <0.4 → non-polar covalent.')
+  ) +
+  summary(['Ionic bonds form between metals and non-metals via electron transfer', 'Covalent bonds form by sharing electrons between non-metals', 'Ionic compounds have high melting points and conduct when molten', 'Metallic bonding explains conductivity and malleability of metals']);
+}
+
+function buildChemRedox() {
+  return section('Oxidation and Reduction',
+    concept('OIL RIG', '<strong>O</strong>xidation <strong>I</strong>s <strong>L</strong>oss (of electrons); <strong>R</strong>eduction <strong>I</strong>s <strong>G</strong>ain (of electrons)') +
+    text('In every redox reaction, one species is oxidised and another is reduced. The <strong>oxidising agent</strong> gets reduced, and the <strong>reducing agent</strong> gets oxidised.') +
+    formula('Example — Zinc + Copper Sulphate', 'Zn + CuSO₄ → ZnSO₄ + Cu<br>Zn is oxidised (loses e⁻); Cu²⁺ is reduced (gains e⁻)')
+  ) +
+  section('Oxidation States',
+    points(['The oxidation state of an uncombined element is 0', 'The sum of oxidation states in a compound equals the overall charge', 'Oxygen is usually −2; Hydrogen is usually +1', 'Fluorine is always −1']) +
+    example('<strong>Find the oxidation state of Mn in KMnO₄.</strong><br>K = +1, O = −2(×4) = −8, total = 0<br>+1 + Mn + (−8) = 0 → Mn = <strong>+7</strong>')
+  ) +
+  summary(['Oxidation = loss of electrons; Reduction = gain of electrons', 'Oxidising agents are reduced; reducing agents are oxidised', 'The activity series predicts which metals will displace others', 'Assign oxidation states using known rules for O, H, and charge balance']);
+}
+
+function buildChemEquil() {
+  return section('Dynamic Equilibrium',
+    concept('Le Chatelier\'s Principle', 'When a system in equilibrium is subjected to a change, the equilibrium shifts in the direction that counteracts that change.') +
+    text('At dynamic equilibrium, the <strong>forward and reverse reaction rates are equal</strong> and concentrations remain constant — not because the reactions have stopped, but because they proceed at the same rate.')
+  ) +
+  section('Factors Affecting Equilibrium',
+    points(['<strong>Concentration</strong> — increasing reactants shifts equilibrium to the right (forward)', '<strong>Pressure</strong> — increasing pressure shifts equilibrium towards fewer moles of gas', '<strong>Temperature</strong> — increasing temperature favours the endothermic direction', '<strong>Catalyst</strong> — speeds up both forward and reverse reactions equally; does NOT shift equilibrium']) +
+    formula('Equilibrium Expression for aA + bB ⇌ cC + dD', 'Kc = [C]ᶜ[D]ᵈ / [A]ᵃ[B]ᵇ') +
+    note('A large Kc (>>1) means equilibrium lies to the right (products favoured). A small Kc (<<1) means reactants are favoured.')
+  ) +
+  summary(['Dynamic equilibrium has equal forward and reverse reaction rates', 'Le Chatelier\'s principle predicts the direction of equilibrium shift', 'Catalysts speed both directions equally — Kc is unchanged', 'Kc > 1 means products are favoured at equilibrium']);
+}
+
+function buildPhysicsMech() {
+  return section('Newton\'s Laws of Motion',
+    points(['<strong>First Law</strong> — An object remains at rest or in uniform motion unless acted upon by a net external force (Law of Inertia)', '<strong>Second Law</strong> — Net force = mass × acceleration (F = ma)', '<strong>Third Law</strong> — For every action there is an equal and opposite reaction']) +
+    formula('Newton\'s Second Law', 'F = ma   (Force in Newtons, mass in kg, acceleration in m/s²)')
+  ) +
+  section('Equations of Motion (SUVAT)',
+    text('For <strong>uniform acceleration</strong>, use these five equations:') +
+    formula('Equations', 'v = u + at<br>s = ut + ½at²<br>v² = u² + 2as<br>s = ½(u + v)t') +
+    example('<strong>A car starts from rest and accelerates at 3 m/s² for 10 s. Find the distance covered.</strong><br>u = 0, a = 3, t = 10<br>s = ut + ½at² = 0 + ½(3)(100) = <strong>150 m</strong>') +
+    note('Always list your known variables (u, v, a, s, t) before choosing which equation to use.')
+  ) +
+  section('Work, Energy and Power',
+    formula('Work Done', 'W = F × d × cos θ') +
+    formula('Kinetic Energy', 'KE = ½mv²') +
+    formula('Gravitational PE', 'PE = mgh') +
+    formula('Power', 'P = W/t = Fv')
+  ) +
+  summary(['F = ma is the cornerstone equation of mechanics', 'SUVAT equations apply only under constant acceleration', 'Energy is conserved: KE + PE = constant (in the absence of friction)', 'Power is the rate of doing work (W/t)']);
+}
+
+function buildPhysicsWaves() {
+  return section('Wave Properties',
+    concept('Wave', 'A wave is a disturbance that transfers energy through matter or space without transferring matter.') +
+    points(['<strong>Amplitude (A)</strong> — maximum displacement from equilibrium', '<strong>Wavelength (λ)</strong> — distance between two successive crests or troughs', '<strong>Frequency (f)</strong> — number of complete waves per second (Hz)', '<strong>Period (T)</strong> — time for one complete wave; T = 1/f', '<strong>Wave speed (v)</strong> — speed at which the wave travels']) +
+    formula('Wave Equation', 'v = fλ')
+  ) +
+  section('Transverse vs Longitudinal Waves',
+    points(['<strong>Transverse</strong> — particles vibrate perpendicular to direction of wave travel (light, water waves)', '<strong>Longitudinal</strong> — particles vibrate parallel to direction of wave travel (sound)']) +
+    section('Sound',
+      text('Sound is a longitudinal mechanical wave that requires a medium. Speed of sound in air ≈ 340 m/s at room temperature.') +
+      formula('Resonance Frequency (closed pipe)', 'f = v / 4L (fundamental)') +
+      note('The higher the frequency of sound, the higher its pitch. Ultrasound has frequency > 20,000 Hz.')
+    )
+  ) +
+  summary(['Waves transfer energy, not matter', 'v = fλ relates wave speed, frequency and wavelength', 'Sound is longitudinal; light is transverse', 'Resonance occurs when a system is driven at its natural frequency']);
+}
+
+function buildPhysicsElec() {
+  return section('Electric Circuits',
+    formula('Ohm\'s Law', 'V = IR   (Voltage in V, Current in A, Resistance in Ω)') +
+    text('Components in a circuit can be connected in <strong>series</strong> or <strong>parallel</strong>:') +
+    formula('Series — Total Resistance', 'R_total = R₁ + R₂ + R₃ + …') +
+    formula('Parallel — Total Resistance', '1/R_total = 1/R₁ + 1/R₂ + 1/R₃ + …')
+  ) +
+  section('Power and Energy',
+    formula('Electrical Power', 'P = IV = I²R = V²/R') +
+    formula('Energy Consumed', 'E = Pt = IVt') +
+    example('<strong>A 60 W bulb is used for 5 hours. How much energy is consumed?</strong><br>E = Pt = 60 × (5 × 3600) = 1,080,000 J = 1.08 MJ') +
+    note('For electricity billing, energy is measured in kilowatt-hours (kWh). 1 kWh = 3.6 × 10⁶ J.')
+  ) +
+  section('Magnetism',
+    text('A current-carrying conductor in a magnetic field experiences a force — this is the basis of electric motors. The direction is given by <strong>Fleming\'s Left-Hand Rule</strong>.') +
+    points(['<strong>Thumb</strong> → direction of force (motion)', '<strong>Index finger</strong> → direction of magnetic field (B)', '<strong>Middle finger</strong> → direction of current (I)'])
+  ) +
+  summary(['Ohm\'s Law: V = IR underpins all circuit analysis', 'Series circuits: current is the same; voltages add', 'Parallel circuits: voltage is the same; currents add', 'Electrical power P = IV; energy E = Pt']);
+}
+
+function buildPhysicsHeat() {
+  return section('Temperature and Heat',
+    concept('Heat vs Temperature', '<strong>Heat</strong> is the total thermal energy transferred. <strong>Temperature</strong> is the average kinetic energy of particles — a measure of hotness.') +
+    formula('Heat Energy', 'Q = mcΔT   (m = mass, c = specific heat capacity, ΔT = temperature change)')
+  ) +
+  section('Heat Transfer',
+    points(['<strong>Conduction</strong> — heat transfer through a material by particle collision; best in metals', '<strong>Convection</strong> — heat transfer through fluid movement (liquids and gases)', '<strong>Radiation</strong> — heat transfer by electromagnetic waves; does not require a medium']) +
+    note('A good absorber of radiation is also a good emitter (black surfaces). A poor absorber is a good reflector (shiny/white surfaces).')
+  ) +
+  section('Thermodynamics',
+    formula('First Law', 'ΔU = Q − W   (Change in internal energy = heat added − work done by system)') +
+    text('The <strong>second law</strong> states that heat naturally flows from a hot object to a cold object — never spontaneously in reverse. This gives the arrow of time its direction.') +
+    example('<strong>A gas absorbs 500 J of heat and does 200 J of work. Find the change in internal energy.</strong><br>ΔU = Q − W = 500 − 200 = <strong>300 J</strong>')
+  ) +
+  summary(['Q = mcΔT calculates heat energy absorbed or released', 'Heat transfers by conduction, convection or radiation', 'The first law of thermodynamics is a statement of energy conservation', 'Black surfaces are the best absorbers and emitters of thermal radiation']);
+}
+
+/* ─── STATE ─────────────────────────────────────────── */
+let activeSubject = 'maths';
+let activeTopic   = null;
+let topicsRead    = new Set();
+
+/* ─── INIT ────────────────────────────────────────── */
+document.getElementById('dashDate').textContent =
+  new Date().toLocaleDateString('en-NG', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+buildProgressStrip();
+buildSubjectTabs();
+selectSubject('maths');
+
+/* ─── BUILD PROGRESS STRIP ── */
+function buildProgressStrip() {
+  document.getElementById('progressStrip').innerHTML = SUBJECTS.map(s => {
+    const fill = s.mastery;
+    const color = fill >= 80 ? '#2ed573' : fill >= 60 ? '#ffa502' : '#e05c6b';
+    return `<div class="mps-card" onclick="selectSubject('${s.id}')">
+      <div class="mps-emoji">${s.emoji}</div>
+      <div class="mps-label">${s.label.split(' ')[0]}</div>
+      <div class="mps-pct" style="color:${color}">${fill}%</div>
+      <div class="mps-bar"><div class="mps-fill" style="width:${fill}%;background:${color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+/* ─── BUILD SUBJECT TABS ── */
+function buildSubjectTabs() {
+  document.getElementById('subjectTabs').innerHTML = SUBJECTS.map(s =>
+    `<div class="subj-tab" data-id="${s.id}" onclick="selectSubject('${s.id}')">
+      <div class="subj-tab-dot" style="background:${s.color}"></div>
+      ${s.emoji} ${s.label}
+    </div>`
+  ).join('');
+}
+
+/* ─── SELECT SUBJECT ── */
+function selectSubject(subjectId) {
+  activeSubject = subjectId;
+  activeTopic   = null;
+
+  // Update tab styles
+  document.querySelectorAll('.subj-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.id === subjectId);
+  });
+  const subj = SUBJECTS.find(s => s.id === subjectId);
+  document.querySelectorAll('.subj-tab.active').forEach(t => {
+    t.style.background = subj.color;
+  });
+
+  // Update topic list
+  const topics = TOPICS[subjectId] || [];
+  document.getElementById('topicListTitle').textContent = `${subj.emoji} ${subj.label}`;
+  document.getElementById('topicCount').textContent = `${topics.length} topics`;
+  renderTopicList(topics);
+
+  // Reset reader
+  showEmptyReader();
+}
+
+/* ─── RENDER TOPIC LIST ── */
+function renderTopicList(topics) {
+  const search = document.getElementById('topicSearch').value.toLowerCase();
+  const filtered = topics.filter(t => t.name.toLowerCase().includes(search));
+  document.getElementById('topicList').innerHTML = filtered.map(t => {
+    const mc = t.mastery >= 80 ? 'tm-high' : t.mastery >= 60 ? 'tm-mid' : t.mastery > 0 ? 'tm-low' : 'tm-none';
+    const ml = t.mastery > 0 ? t.mastery + '%' : 'New';
+    return `<div class="topic-item ${activeTopic === t.id ? 'active' : ''}" onclick="selectTopic('${t.id}')">
+      <div class="ti-icon">${t.icon}</div>
+      <div class="ti-info">
+        <div class="ti-name">${t.name}</div>
+        <div class="ti-sub">${t.scheme_id}</div>
+      </div>
+      <span class="ti-mastery ${mc}">${ml}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ─── SELECT TOPIC ── */
+function selectTopic(topicId) {
+  activeTopic = topicId;
+  const topics = TOPICS[activeSubject] || [];
+  const topic  = topics.find(t => t.id === topicId);
+  if (!topic) return;
+
+  topicsRead.add(topicId);
+  renderTopicList(topics); // update active state
+
+  const subj  = SUBJECTS.find(s => s.id === activeSubject);
+  const mc    = topic.mastery >= 80 ? '#2ed573' : topic.mastery >= 60 ? '#ffa502' : '#e05c6b';
+  const diff  = topic.mastery >= 80 ? { label:'Mastered', bg:'rgba(46,213,115,.12)', color:'#2ed573', border:'rgba(46,213,115,.25)' }
+              : topic.mastery >= 60 ? { label:'Good Progress', bg:'rgba(255,165,2,.10)', color:'#ffa502', border:'rgba(255,165,2,.25)' }
+              : { label:'Needs Practice', bg:'rgba(224,92,107,.10)', color:'#e05c6b', border:'rgba(224,92,107,.25)' };
+
+  document.getElementById('emptyReader').style.display = 'none';
+  const rc = document.getElementById('readerContent');
+  rc.style.display = 'block';
+  rc.innerHTML = `
+    <div class="reader-header">
+      <div class="rh-left">
+        <div class="rh-breadcrumb">${subj.emoji} ${subj.label} <span>›</span> ${topic.name}</div>
+        <div class="rh-title">${topic.icon} ${topic.name}</div>
+        <div class="rh-meta">
+          <span class="rh-pill" style="background:${diff.bg};color:${diff.color};border-color:${diff.border}">${diff.label}</span>
+          <span class="rh-pill" style="color:${mc};border-color:${mc};background:rgba(0,0,0,.04)">Mastery: ${topic.mastery > 0 ? topic.mastery + '%' : 'Not started'}</span>
+          <span class="rh-pill" style="color:var(--text-3);border-color:var(--border);background:var(--bg-3)">${topic.scheme_id}</span>
+        </div>
+      </div>
+      <div class="rh-actions">
+        <button class="rh-btn" onclick="window.print()">🖨️ Print</button>
+        <a class="rh-btn primary" href="quiz.html">🎯 Practice This Topic</a>
+      </div>
+    </div>
+    <div class="reader-body">
+      <div class="read-progress-bar"><div class="rpb-fill" id="readProgress" style="width:0%"></div></div>
+      ${topic.content}
+    </div>
+    <div class="reader-footer">
+      <div class="rf-nav">
+        <button class="rh-btn" onclick="navTopic(-1)">← Prev Topic</button>
+        <button class="rh-btn" onclick="navTopic(1)">Next Topic →</button>
+      </div>
+      <a class="rh-btn primary" href="quiz.html">Start Practice Quiz 🎯</a>
+    </div>`;
+
+  // Animate read progress on scroll
+  setTimeout(trackReadProgress, 200);
+}
+
+function showEmptyReader() {
+  document.getElementById('emptyReader').style.display = 'flex';
+  document.getElementById('readerContent').style.display = 'none';
+}
+
+/* ─── TRACK READING PROGRESS (scroll-based) ── */
+function trackReadProgress() {
+  const panel = document.querySelector('.reader-panel');
+  if (!panel) return;
+  const bar = document.getElementById('readProgress');
+  if (!bar) return;
+  panel.addEventListener('scroll', () => {
+    const { scrollTop, scrollHeight, clientHeight } = panel;
+    const pct = Math.round((scrollTop / (scrollHeight - clientHeight)) * 100);
+    bar.style.width = Math.min(pct, 100) + '%';
+  });
+}
+
+/* ─── NAVIGATE TOPICS ── */
+function navTopic(dir) {
+  const topics = TOPICS[activeSubject] || [];
+  const idx = topics.findIndex(t => t.id === activeTopic);
+  const next = topics[idx + dir];
+  if (next) selectTopic(next.id);
+}
+
+/* ─── SEARCH ── */
+document.getElementById('topicSearch').addEventListener('input', () => {
+  renderTopicList(TOPICS[activeSubject] || []);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register | Dynamic Mastery Assessment</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    /* Role switcher (same as login) */
+    .role-switcher {
+      display: flex;
+      background: var(--surface);
+      border: 2px solid var(--border-2);
+      border-radius: 50px;
+      padding: 5px;
+      gap: 4px;
+      margin-bottom: 28px;
+    }
+    .role-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 16px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text-2);
+      transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    .role-btn.active { color: #fff; box-shadow: 0 4px 12px rgba(108,99,255,0.35); }
+    .role-btn.role-student.active { background: var(--grad-primary); }
+    .role-btn.role-admin.active   { background: var(--grad-warm); box-shadow: 0 4px 12px rgba(255,101,132,0.35); }
+    .role-btn:hover:not(.active)  { background: var(--surface-2); color: var(--text-1); }
+
+    .admin-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg,rgba(255,101,132,0.1),rgba(255,159,67,0.08));
+      border: 1.5px solid rgba(255,101,132,0.25);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--secondary);
+      margin-bottom: 20px;
+      animation: fadeInUp 0.35s ease both;
+    }
+    .admin-badge span:first-child { font-size: 20px; }
+
+    .auth-left { transition: background 0.4s ease; }
+    .auth-left.admin-left { background: linear-gradient(135deg, #ff6584, #ff9f43); }
+
+    .admin-only-field { display: none; animation: fadeInUp 0.3s ease both; }
+    .admin-only-field.visible { display: flex; }
+    .student-only-field.hidden-field { display: none; }
+
+    .admin-mode .form-group input:focus,
+    .admin-mode .form-group select:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 4px rgba(255,101,132,0.12);
+    }
+    .admin-mode #submitBtn {
+      background: var(--grad-warm);
+      box-shadow: 0 4px 0 #a83050;
+    }
+
+    .security-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: rgba(255,211,61,0.08);
+      border: 1.5px solid rgba(255,211,61,0.2);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+    .security-note span:first-child { font-size: 14px; flex-shrink:0; margin-top: 1px; }
+
+    /* Admin role selector */
+    .admin-role-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .admin-role-chip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 16px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      border: 2px solid var(--border-2);
+      background: var(--surface);
+      color: var(--text-2);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .admin-role-chip input { display: none; }
+    .admin-role-chip:hover { border-color: var(--secondary); color: var(--text-1); }
+    .admin-role-chip:has(input:checked) {
+      border-color: var(--secondary);
+      background: rgba(255,101,132,0.08);
+      color: var(--secondary);
+    }
+    .admin-role-chip .arc-desc {
+      font-size: 10px;
+      color: var(--text-3);
+      font-weight: 600;
+      display: block;
+      margin-top: 1px;
+    }
+  </style>
+</head>
+<body class="auth-body">
+
+<div class="auth-page" id="authPage">
+
+  <!-- LEFT PANEL -->
+  <div class="auth-left" id="authLeft">
+    <div class="auth-left-content">
+      <a href="index.html" class="nav-logo auth-logo">
+        <div class="logo-icon">⚡</div>
+        <div class="logo-text">
+          <span class="logo-main">DMA</span>
+          <span class="logo-sub">Dynamic Mastery</span>
+        </div>
+      </a>
+
+      <!-- Student left -->
+      <div id="studentLeftContent">
+        <div class="auth-quote">
+          <h2>"The secret of getting ahead is getting started."</h2>
+          <p>— Mark Twain</p>
+        </div>
+        <div class="auth-features-mini">
+          <div class="afm"><span>✓</span> Adaptive quiz engine</div>
+          <div class="afm"><span>✓</span> Topic mastery tracking</div>
+          <div class="afm"><span>✓</span> 500+ UTME/SSCE questions</div>
+          <div class="afm"><span>🎮</span> Game Zone for breaks</div>
+        </div>
+      </div>
+
+      <!-- Admin left -->
+      <div id="adminLeftContent" style="display:none">
+        <div class="auth-quote">
+          <h2>Create an Admin Account</h2>
+          <p>Admin accounts require a valid invite code issued by the system owner.</p>
+        </div>
+        <div class="auth-features-mini">
+          <div class="afm"><span>👥</span> Full student management</div>
+          <div class="afm"><span>📋</span> Question bank control</div>
+          <div class="afm"><span>📊</span> Analytics &amp; reporting</div>
+          <div class="afm"><span>🔑</span> Invite-code protected</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="auth-right">
+    <div class="auth-card">
+
+      <!-- ROLE SWITCHER -->
+      <div class="role-switcher">
+        <button class="role-btn role-student active" id="btnStudent" onclick="switchRole('student')">
+          🎓 Student
+        </button>
+        <button class="role-btn role-admin" id="btnAdmin" onclick="switchRole('admin')">
+          🛡️ Admin
+        </button>
+      </div>
+
+      <!-- STUDENT HEADER -->
+      <div class="auth-card-header" id="studentHeader">
+        <h1>Create Account 🚀</h1>
+        <p>Start your free adaptive practice journey</p>
+      </div>
+
+      <!-- ADMIN HEADER -->
+      <div class="auth-card-header hidden" id="adminHeader">
+        <h1>Admin Registration 🛡️</h1>
+        <p>Requires a valid invite code from the system owner</p>
+      </div>
+
+      <!-- ADMIN BADGE -->
+      <div class="admin-badge hidden" id="adminBadge">
+        <span>🔐</span>
+        <span>Admin accounts have elevated privileges. All activity is audited.</span>
+      </div>
+
+      <!-- FORM -->
+      <!-- BACKEND NOTE:
+           POST to /api/register
+           Hidden `role` field tells backend to create student or admin account.
+           Admin registration additionally requires validating `invite_code` against
+           a server-side table of pre-generated codes (single-use, expire after use).
+      -->
+      <form class="auth-form" id="registerForm" action="#" method="POST" novalidate>
+        <input type="hidden" name="role" id="roleField" value="student"/>
+
+        <!-- Name row (both roles) -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" name="first_name" placeholder="e.g. David" required/>
+            <span class="field-error" id="err-firstName"></span>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" name="last_name" placeholder="e.g. Anjorin" required/>
+            <span class="field-error" id="err-lastName"></span>
+          </div>
+        </div>
+
+        <!-- Email (both) -->
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="yourname@email.com" required/>
+          <span class="field-error" id="err-email"></span>
+        </div>
+
+        <!-- Phone (student only) -->
+        <div class="form-group student-only-field" id="phoneField">
+          <label for="phone">Phone Number <span class="optional">(optional)</span></label>
+          <input type="tel" id="phone" name="phone" placeholder="+234 800 000 0000"/>
+        </div>
+
+        <!-- Exam type (student only) -->
+        <div class="form-group student-only-field" id="examTypeField">
+          <label>Exam Type</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="exam_type" value="UTME" checked/>
+              <span class="radio-custom"></span>
+              UTME (University)
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="exam_type" value="SSCE"/>
+              <span class="radio-custom"></span>
+              SSCE (Secondary)
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="exam_type" value="BOTH"/>
+              <span class="radio-custom"></span>
+              Both
+            </label>
+          </div>
+        </div>
+
+        <!-- Admin Role (admin only) -->
+        <div class="form-group admin-only-field" id="adminRoleField">
+          <label>Admin Role</label>
+          <div class="admin-role-chips">
+            <label class="admin-role-chip">
+              <input type="radio" name="admin_role" value="super_admin"/>
+              <div>
+                <span>👑 Super Admin</span>
+                <span class="arc-desc">Full system access</span>
+              </div>
+            </label>
+            <label class="admin-role-chip">
+              <input type="radio" name="admin_role" value="content_admin" checked/>
+              <div>
+                <span>📋 Content Admin</span>
+                <span class="arc-desc">Questions &amp; subjects</span>
+              </div>
+            </label>
+            <label class="admin-role-chip">
+              <input type="radio" name="admin_role" value="student_admin"/>
+              <div>
+                <span>👥 Student Admin</span>
+                <span class="arc-desc">User management only</span>
+              </div>
+            </label>
+          </div>
+          <span class="field-error" id="err-adminRole"></span>
+        </div>
+
+        <!-- Admin Invite Code (admin only) -->
+        <div class="form-group admin-only-field" id="inviteCodeField">
+          <label for="inviteCode">
+            Invite Code
+            <span class="optional">Required for admin</span>
+          </label>
+          <div class="input-icon-wrap">
+            <input type="text" id="inviteCode" name="invite_code"
+                   placeholder="e.g. DMA-ADMIN-XXXX"
+                   style="text-transform:uppercase;letter-spacing:1px;font-size:13px;"/>
+          </div>
+          <span class="field-error" id="err-inviteCode"></span>
+          <div class="security-note">
+            <span>🔒</span>
+            Invite codes are single-use and issued by the system owner. Contact Dr. T.V. Igbe or the lead developer if you need one.
+          </div>
+        </div>
+
+        <!-- Password (both) -->
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-icon-wrap">
+            <input type="password" id="password" name="password" placeholder="Min. 8 characters" required/>
+            <button type="button" class="toggle-password" onclick="togglePwd('password', this)">👁</button>
+          </div>
+          <div class="password-strength" id="pwStrength">
+            <div class="ps-bar"><div class="ps-fill" id="psFill"></div></div>
+            <span id="psLabel"></span>
+          </div>
+          <span class="field-error" id="err-password"></span>
+        </div>
+
+        <!-- Confirm Password (both) -->
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="input-icon-wrap">
+            <input type="password" id="confirmPassword" name="confirm_password" placeholder="Re-enter password" required/>
+            <button type="button" class="toggle-password" onclick="togglePwd('confirmPassword', this)">👁</button>
+          </div>
+          <span class="field-error" id="err-confirm"></span>
+        </div>
+
+        <!-- Terms -->
+        <div class="form-check">
+          <label class="checkbox-option">
+            <input type="checkbox" name="agree_terms" id="agreeTerms" required/>
+            <span class="checkbox-custom"></span>
+            I agree to the <a href="#">Terms of Use</a> and <a href="#">Privacy Policy</a>
+          </label>
+          <span class="field-error" id="err-terms"></span>
+        </div>
+
+        <div class="server-error hidden" id="serverError"></div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg" id="submitBtn">
+          <span class="btn-text" id="submitBtnText">Create My Account</span>
+          <span class="btn-spinner hidden">⏳</span>
+        </button>
+      </form>
+
+      <p class="auth-switch">Already have an account? <a href="login.html">Login here</a></p>
+
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  function switchRole(role) {
+    const isAdmin = role === 'admin';
+
+    document.getElementById('btnStudent').classList.toggle('active', !isAdmin);
+    document.getElementById('btnAdmin').classList.toggle('active', isAdmin);
+
+    document.getElementById('studentHeader').classList.toggle('hidden', isAdmin);
+    document.getElementById('adminHeader').classList.toggle('hidden', !isAdmin);
+    document.getElementById('adminBadge').classList.toggle('hidden', !isAdmin);
+
+    // Left panel
+    document.getElementById('authLeft').classList.toggle('admin-left', isAdmin);
+    document.getElementById('studentLeftContent').style.display = isAdmin ? 'none' : 'block';
+    document.getElementById('adminLeftContent').style.display = isAdmin ? 'block' : 'none';
+
+    // Show/hide fields
+    document.querySelectorAll('.student-only-field').forEach(el => {
+      el.classList.toggle('hidden-field', isAdmin);
+    });
+    document.querySelectorAll('.admin-only-field').forEach(el => {
+      el.classList.toggle('visible', isAdmin);
+    });
+
+    // Admin fields required
+    document.getElementById('inviteCode').required = isAdmin;
+
+    // Form style
+    document.getElementById('registerForm').classList.toggle('admin-mode', isAdmin);
+
+    // Role field
+    document.getElementById('roleField').value = role;
+
+    // Button text
+    document.getElementById('submitBtnText').textContent = isAdmin
+      ? '🛡️ Create Admin Account'
+      : 'Create My Account 🚀';
+  }
+
+  // Auto-switch if URL param present (e.g. from login page link)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('role') === 'admin') switchRole('admin');
+</script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile | DMA</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+  <style>
+    .profile-grid { display: grid; grid-template-columns: 300px 1fr; gap: 22px; }
+    .profile-left { display: flex; flex-direction: column; gap: 16px; }
+    .profile-avatar-card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius-xl); padding: 28px; text-align: center; }
+    .big-avatar { width: 90px; height: 90px; background: var(--grad-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 36px; margin: 0 auto 14px; }
+    .profile-name { font-family: var(--font-display); font-size: 22px; margin-bottom: 4px; }
+    .profile-type { font-size: 12px; font-weight: 800; color: var(--text-3); background: var(--bg-3); padding: 3px 12px; border-radius: 50px; display: inline-block; margin-bottom: 16px; }
+    .profile-stats-mini { display: flex; gap: 12px; justify-content: center; }
+    .psm { text-align: center; }
+    .psm-num { font-family: var(--font-display); font-size: 22px; display: block; }
+    .psm-lbl { font-size: 11px; font-weight: 700; color: var(--text-3); }
+    .profile-form { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius-xl); padding: 24px; }
+    .pf-title { font-family: var(--font-display); font-size: 18px; margin-bottom: 18px; }
+    .pf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .pf-group { display: flex; flex-direction: column; gap: 6px; }
+    .pf-group label { font-size: 12px; font-weight: 800; color: var(--text-2); text-transform: uppercase; letter-spacing: .5px; }
+    .pf-group input, .pf-group select { background: var(--bg-3); border: 2px solid var(--border-2); border-radius: 12px; padding: 10px 14px; font-size: 14px; font-weight: 600; color: var(--text-1); outline: none; transition: border .2s; font-family: var(--font); }
+    .pf-group input:focus, .pf-group select:focus { border-color: var(--primary); }
+    .pf-group input:disabled { opacity: .55; cursor: not-allowed; }
+    @media(max-width:900px){ .profile-grid{grid-template-columns:1fr} }
+    @media(max-width:600px){ .pf-row{grid-template-columns:1fr} .profile-stats-mini{gap:20px} }
+  </style>
+</head>
+<body class="dashboard-body">
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text"><span class="logo-main">DMA</span><span class="logo-sub">Mastery</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="dashboard.html" class="sn-item"><span class="sn-icon">🏠</span><span>Dashboard</span></a>
+    <a href="quiz.html" class="sn-item"><span class="sn-icon">🧠</span><span>Practice Session</span></a>
+    <a href="reports.html" class="sn-item"><span class="sn-icon">📊</span><span>Reports</span></a>
+    <a href="games.html" class="sn-item"><span class="sn-icon">🎮</span><span>Game Zone</span><span class="sn-new">NEW</span></a>
+    <a href="profile.html" class="sn-item active"><span class="sn-icon">👤</span><span>Profile</span></a>
+    <div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border)"></div>
+    <a href="login.html" class="sn-item sn-logout"><span class="sn-icon">🚪</span><span>Logout</span></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="sidebar-user">
+      <div class="su-avatar">D</div>
+      <div class="su-info"><span class="su-name">David A.</span><span class="su-type">UTME Student</span></div>
+    </div>
+  </div>
+</aside>
+
+<main class="dashboard-main">
+  <header class="dash-header">
+    <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="dash-header-content">
+      <h1 class="dash-welcome">👤 My Profile</h1>
+      <p class="dash-date">Manage your account and exam settings</p>
+    </div>
+    <div class="dash-header-actions">
+      <button class="theme-toggle" id="themeToggle">
+        <span class="toggle-option active" id="darkOpt">🌙</span>
+        <span class="toggle-option" id="lightOpt">☀️</span>
+      </button>
+      <a href="quiz.html" class="btn btn-primary btn-sm">▶ Practice</a>
+    </div>
+  </header>
+
+  <div class="dash-content">
+    <div class="profile-grid">
+
+      <!-- LEFT COLUMN -->
+      <div class="profile-left">
+        <div class="profile-avatar-card">
+          <div class="big-avatar">D</div>
+          <div class="profile-name">David Anjorin</div>
+          <div class="profile-type">UTME Student</div>
+          <div class="profile-stats-mini">
+            <div class="psm"><span class="psm-num" style="color:var(--primary)">247</span><span class="psm-lbl">Questions</span></div>
+            <div class="psm"><span class="psm-num" style="color:var(--accent-green)">71%</span><span class="psm-lbl">Accuracy</span></div>
+            <div class="psm"><span class="psm-num" style="color:var(--accent-yellow)">🔥7</span><span class="psm-lbl">Streak</span></div>
+          </div>
+          <div style="margin-top:16px">
+            <button class="btn btn-outline btn-full" style="margin-bottom:8px">📷 Change Avatar</button>
+            <button class="btn btn-danger btn-full">🗑 Delete Account</button>
+          </div>
+        </div>
+
+        <div class="dash-card">
+          <div class="dc-header"><h2>🏆 Achievements</h2></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="background:var(--bg-3);border-radius:14px;padding:14px;text-align:center">
+              <div style="font-size:28px;margin-bottom:5px">🔥</div>
+              <div style="font-size:12px;font-weight:800;color:var(--accent-yellow)">7-Day Streak</div>
+            </div>
+            <div style="background:var(--bg-3);border-radius:14px;padding:14px;text-align:center">
+              <div style="font-size:28px;margin-bottom:5px">🧠</div>
+              <div style="font-size:12px;font-weight:800;color:var(--primary-light)">100 Questions</div>
+            </div>
+            <div style="background:var(--bg-3);border-radius:14px;padding:14px;text-align:center;opacity:.4">
+              <div style="font-size:28px;margin-bottom:5px">🏆</div>
+              <div style="font-size:12px;font-weight:800;color:var(--text-3)">Top Scorer 🔒</div>
+            </div>
+            <div style="background:var(--bg-3);border-radius:14px;padding:14px;text-align:center;opacity:.4">
+              <div style="font-size:28px;margin-bottom:5px">⭐</div>
+              <div style="font-size:12px;font-weight:800;color:var(--text-3)">Perfect Score 🔒</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="profile-form">
+          <div class="pf-title">Personal Information</div>
+          <div class="pf-row">
+            <div class="pf-group"><label>First Name</label><input type="text" value="David"/></div>
+            <div class="pf-group"><label>Last Name</label><input type="text" value="Anjorin"/></div>
+          </div>
+          <div class="pf-row">
+            <div class="pf-group"><label>Email Address</label><input type="email" value="david@run.edu.ng"/></div>
+            <div class="pf-group"><label>Phone Number</label><input type="tel" value="+234 800 000 0000"/></div>
+          </div>
+          <div class="pf-row">
+            <div class="pf-group"><label>Matric Number</label><input type="text" value="RUN/CMP/22/12854" disabled/></div>
+            <div class="pf-group"><label>Department</label><input type="text" value="Computer Science" disabled/></div>
+          </div>
+          <button class="btn btn-primary" onclick="alert('Profile updated! (Connect to api/profile/update.php)')">💾 Save Changes</button>
+        </div>
+
+        <div class="profile-form">
+          <div class="pf-title">Exam Configuration</div>
+          <div class="pf-row">
+            <div class="pf-group">
+              <label>Exam Type</label>
+              <select>
+                <option selected>UTME (University)</option>
+                <option>SSCE (Secondary)</option>
+                <option>Both</option>
+              </select>
+            </div>
+            <div class="pf-group">
+              <label>Target Year</label>
+              <select>
+                <option>2026</option><option>2027</option>
+              </select>
+            </div>
+          </div>
+          <div class="pf-group" style="margin-bottom:14px">
+            <label>Target University / Institution</label>
+            <input type="text" placeholder="e.g. University of Lagos"/>
+          </div>
+          <button class="btn btn-primary" onclick="alert('Exam settings saved!')">💾 Save Exam Settings</button>
+        </div>
+
+        <div class="profile-form">
+          <div class="pf-title">Change Password</div>
+          <div class="pf-row">
+            <div class="pf-group"><label>Current Password</label><input type="password" placeholder="••••••••"/></div>
+            <div class="pf-group"><label>New Password</label><input type="password" placeholder="Min. 8 characters"/></div>
+          </div>
+          <button class="btn btn-primary" onclick="alert('Password changed! (Connect to api/profile/password.php)')">🔒 Update Password</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
